@@ -3,6 +3,7 @@
         xmlns:vm="using:ReceiptOverview.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ReceiptOverview.Views"
         mc:Ignorable="d"
         d:DesignWidth="800"
         d:DesignHeight="450"
@@ -34,7 +35,7 @@
 
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Export to CSV"
+            <MenuItem Header="Export to CSV" Command="{Binding ExportToCsvCommand}"
                       IsTabStop="False">
                 <MenuItem.Icon>
                     <Image Width="16"
@@ -50,7 +51,7 @@
             <StackPanel DockPanel.Dock="Top"
                         Orientation="Horizontal">
                 <Button Margin="5,0,0,0" 
-                        IsTabStop="False"
+                        IsTabStop="False" Command="{Binding NewPositionCommand}"
                         Name="BtnNewPos"
                         HotKey="Ctrl+N">
                     <Button.Template>
@@ -73,18 +74,23 @@
                     </Button.Template>
                 </Button>
             </StackPanel>
-            <DataGrid Margin="10"
+            
+            <DataGrid Margin="10" ItemsSource="{Binding Positions}" SelectedItem="{Binding CurrentPosition}"
                       VerticalAlignment="Stretch"
                       IsTabStop="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Date" />
-                    <DataGridTextColumn Header="Total Price" />
+                    <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
+                    <DataGridTextColumn Header="Total Price" Binding="{Binding Total}"/>
                     <DataGridTemplateColumn Header="Delete Position">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="avares://ReceiptOverview/Assets/delete.png"
-                                       Width="16"
-                                       Height="16" />
+                                <Button Command="{Binding DataContext.RemovePositionCommand, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}">
+                                    <ControlTemplate>
+                                        <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                                       Width="16"
+                                                       Height="16" />
+                                    </ControlTemplate>
+                                </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -103,6 +109,7 @@
                                FontStyle="Italic"
                                Foreground="Gray" />
                     <TextBlock VerticalAlignment="Center"
+                               Text="{Binding CurrentPosition.Id}"
                                FontStyle="Italic"
                                Foreground="Gray" />
 
@@ -112,24 +119,25 @@
                                FontStyle="Italic"
                                Foreground="Gray" />
                     <TextBlock VerticalAlignment="Center"
-                               FontStyle="Italic"
+                               FontWeight="Bold"
+                               FontStyle="Italic" Text="{Binding CurrentPosition.Total}"
                                Foreground="Gray" />
                 </StackPanel>
 
-                <TextBox Watermark="Date"
+                <TextBox Watermark="Date" Text="{Binding CurrentPosition.Date, Mode=TwoWay}"
                          IsTabStop="False" />
                 <Separator Margin="0,5,0,25" />
 
-                <TextBox Watermark="Name"
+                <TextBox Watermark="Item" Text="{Binding CurrentEntry.Item, Mode=TwoWay}"
                          TabIndex="0" />
-                <TextBox Watermark="Category"
+                <TextBox Watermark="Category" Text="{Binding CurrentEntry.Category, Mode=TwoWay}"
                          TabIndex="1" />
-                <TextBox Watermark="Price"
+                <TextBox Watermark="Price" Text="{Binding CurrentEntry.Price, Mode=TwoWay}"
                          TabIndex="2" />
 
                 <DockPanel HorizontalAlignment="Right" Width="150"
                            Margin="0,5,0,25">
-                    <Button Margin="5,0,10,0" HorizontalAlignment="Stretch"
+                    <Button Margin="5,0,10,0" HorizontalAlignment="Stretch" Command="{Binding NewEntryCommand}"
                             IsTabStop="False"
                             Name="BtnAdd"
                             HotKey="Enter">
@@ -154,21 +162,25 @@
                     </Button>
                 </DockPanel>
 
-                <DataGrid IsReadOnly="True"
+                <DataGrid IsReadOnly="True" ItemsSource="{Binding CurrentPosition.Entries}" SelectedItem="{Binding CurrentEntry}"
                           Margin="0,0,10,0"
                           VerticalAlignment="Stretch"
                           IsTabStop="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name"
+                        <DataGridTextColumn Header="Item" Binding="{Binding Item}"
                                             MinWidth="120" />
-                        <DataGridTextColumn Header="Price" />
-                        <DataGridTextColumn Header="Category" />
+                        <DataGridTextColumn Header="Price"  Binding="{Binding Price}"/>
+                        <DataGridTextColumn Header="Category"  Binding="{Binding Category}"/>
                         <DataGridTemplateColumn Header="Delete Entry">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="avares://ReceiptOverview/Assets/delete.png"
-                                           Width="16"
-                                           Height="16" />
+                                    <Button Command="{Binding DataContext.RemoveEntryCommand, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}">
+                                        <ControlTemplate>
+                                            <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                                           Width="16"
+                                                           Height="16" />
+                                        </ControlTemplate>
+                                    </Button>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -177,7 +189,7 @@
 
                 <DockPanel HorizontalAlignment="Right" Width="150">
                     <Button Margin="5,10,10,0"
-                            HotKey="Ctrl+S"
+                            HotKey="Ctrl+S" Command="{Binding SaveCommand}"
                             Name="BtnSavePosition"
                             IsTabStop="False">
                         <Button.Template>

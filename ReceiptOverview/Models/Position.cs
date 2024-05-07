@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ReceiptOverview.Models
 {
@@ -7,5 +8,6 @@ namespace ReceiptOverview.Models
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public decimal Total { get; set; }
+        public List<Entry> Entries { get; set; }
     }
 }
