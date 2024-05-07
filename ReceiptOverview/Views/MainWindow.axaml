@@ -9,10 +9,10 @@
         Width="800"
         Height="600"
         MinWidth="800"
-        MinHeight="600"
+        MinHeight="700"
         x:Class="ReceiptOverview.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="avares://ReceiptOverview/Assets/avalonia-logo.ico"
         Title="Receipt Overview">
 
     <Design.DataContext>
@@ -34,68 +34,172 @@
 
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Add New Entry" />
-            <MenuItem Header="Export to CSV" />
+            <MenuItem Header="Export to CSV"
+                      IsTabStop="False">
+                <MenuItem.Icon>
+                    <Image Width="16"
+                           Height="16"
+                           Source="avares://ReceiptOverview/Assets/csv.png" />
+                </MenuItem.Icon>
+            </MenuItem>
         </Menu>
 
-
-        <DockPanel Margin="10,10,10,10"
+        <!-- Positions ; Left Side -->
+        <DockPanel Margin="10,10,10,10" 
                    LastChildFill="True">
-            <TextBlock Text="Positions"
-                       DockPanel.Dock="Top" />
-            <Line Height="1"
-                  Margin="0,5,0,5" />
-            <DataGrid Margin="10">
+            <StackPanel DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                <Button Margin="5,0,0,0" 
+                        IsTabStop="False"
+                        Name="BtnNewPos"
+                        HotKey="Ctrl+N">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Border Background="{TemplateBinding Background}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    BorderThickness="8"
+                                    CornerRadius="3">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="New Position"
+                                               VerticalAlignment="Center"
+                                               Margin="5,0,5,0" />
+                                    <Image Source="avares://ReceiptOverview/Assets/add.png"
+                                           Width="16"
+                                           Height="16" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+            <DataGrid Margin="10"
+                      VerticalAlignment="Stretch"
+                      IsTabStop="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Date" />
                     <DataGridTextColumn Header="Total Price" />
                     <DataGridTemplateColumn Header="Delete Position">
-                        <DataTemplate>
-                            <Button>
-                                <DataTemplate>
-                                    <Image Source="/Assets/avalonia-logo.ico" />
-                                </DataTemplate>
-                            </Button>
-                        </DataTemplate>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                       Width="16"
+                                       Height="16" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
 
+        <!-- Entries ; Right Side -->
         <DockPanel DockPanel.Dock="Right"
                    Margin="10,10,10,10">
-            <Button DockPanel.Dock="Top"
-                    Content="Add new Entry"
-                    Margin="0,10,5,10" />
-            <Line Height="10"
-                  Margin="0, 5, 0, 5" />
             <StackPanel Orientation="Vertical">
-                <TextBox Watermark="Name" />
-                <TextBox Watermark="Category" />
-                <TextBox Watermark="Price" />
-                <TextBox Watermark="Name" />
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Stretch">
+                    <TextBlock Text="Position ID:"
+                               VerticalAlignment="Center"
+                               FontStyle="Italic"
+                               Foreground="Gray" />
+                    <TextBlock VerticalAlignment="Center"
+                               FontStyle="Italic"
+                               Foreground="Gray" />
 
-                <DockPanel HorizontalAlignment="Right"
-                           Margin="0,10,0,10">
-                    <Button Content="Add" />
+                    <TextBlock Text="Total:"
+                               VerticalAlignment="Center"
+                               Margin="20,0,0,0"
+                               FontStyle="Italic"
+                               Foreground="Gray" />
+                    <TextBlock VerticalAlignment="Center"
+                               FontStyle="Italic"
+                               Foreground="Gray" />
+                </StackPanel>
+
+                <TextBox Watermark="Date"
+                         IsTabStop="False" />
+                <Separator Margin="0,5,0,25" />
+
+                <TextBox Watermark="Name"
+                         TabIndex="0" />
+                <TextBox Watermark="Category"
+                         TabIndex="1" />
+                <TextBox Watermark="Price"
+                         TabIndex="2" />
+
+                <DockPanel HorizontalAlignment="Right" Width="150"
+                           Margin="0,5,0,25">
+                    <Button Margin="5,0,10,0" HorizontalAlignment="Stretch"
+                            IsTabStop="False"
+                            Name="BtnAdd"
+                            HotKey="Enter">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Border Background="{TemplateBinding Background}"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
+                                        BorderThickness="8"
+                                        CornerRadius="3">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <TextBlock Text="Add"
+                                                   VerticalAlignment="Center"
+                                                   Margin="5,0,5,0" />
+                                        <Image Source="avares://ReceiptOverview/Assets/add.png"
+                                               Width="16"
+                                               Height="16" />
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
                 </DockPanel>
 
-                <DataGrid IsReadOnly="True">
+                <DataGrid IsReadOnly="True"
+                          Margin="0,0,10,0"
+                          VerticalAlignment="Stretch"
+                          IsTabStop="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" />
+                        <DataGridTextColumn Header="Name"
+                                            MinWidth="120" />
                         <DataGridTextColumn Header="Price" />
                         <DataGridTextColumn Header="Category" />
-                        <DataGridTemplateColumn Header="Delete Position">
-                            <DataTemplate>
-                                <Button>
-                                    <DataTemplate>
-                                        <Image Source="/Assets/avalonia-logo.ico" />
-                                    </DataTemplate>
-                                </Button>
-                            </DataTemplate>
+                        <DataGridTemplateColumn Header="Delete Entry">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                           Width="16"
+                                           Height="16" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
+
+                <DockPanel HorizontalAlignment="Right" Width="150">
+                    <Button Margin="5,10,10,0"
+                            HotKey="Ctrl+S"
+                            Name="BtnSavePosition"
+                            IsTabStop="False">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Border Background="{TemplateBinding Background}"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        BorderThickness="8"
+                                        CornerRadius="3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Save Position"
+                                                   VerticalAlignment="Center"
+                                                   Margin="5,0,5,0" />
+                                        <Image Source="avares://ReceiptOverview/Assets/add.png"
+                                               Width="16"
+                                               Height="16" />
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </DockPanel>
             </StackPanel>
         </DockPanel>
     </DockPanel>

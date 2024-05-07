@@ -25,4 +25,9 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10"/>
         <PackageReference Include="SQLite" Version="3.13.0" />
     </ItemGroup>
+
+
+    <ItemGroup>
+      <None Remove="README.md" />
+    </ItemGroup>
 </Project>
