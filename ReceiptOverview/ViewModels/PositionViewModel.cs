@@ -7,8 +7,8 @@ namespace ReceiptOverview.ViewModels;
 public class PositionViewModel : ViewModelBase
 {
     private int _id;
-    private DateTime _date;
-    private decimal _total;
+    private string _date;
+    private string _total;
     private ObservableCollection<EntryViewModel> _entries;
 
     public ObservableCollection<EntryViewModel> Entries
@@ -17,13 +17,13 @@ public class PositionViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _entries, value);
     }
 
-    public decimal Total
+    public string Total
     {
         get => _total;
         set => this.RaiseAndSetIfChanged(ref _total, value);
     }
 
-    public DateTime Date
+    public string Date
     {
         get => _date;
         set => this.RaiseAndSetIfChanged(ref _date, value);

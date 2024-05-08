@@ -20,3 +20,6 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [/home/al/Dokumente/dev/cs/ReceiptOverview/ReceiptOverview/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[/home/al/Dokumente/dev/cs/ReceiptOverview/ReceiptOverview/Views/SimpleMessageBox.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

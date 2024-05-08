@@ -7,7 +7,7 @@ public class EntryViewModel : ViewModelBase
     private int _id;
     private int _positionId;
     private string _item;
-    private decimal _price;
+    private string _price;
     private string _category;
     
     public string Category
@@ -16,7 +16,7 @@ public class EntryViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _category, value);
     }
 
-    public decimal Price
+    public string Price
     {
         get => _price;
         set => this.RaiseAndSetIfChanged(ref _price, value);

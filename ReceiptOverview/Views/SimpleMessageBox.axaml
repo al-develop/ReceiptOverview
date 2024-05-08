@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DesignWidth="800"
+        d:DesignHeight="450"
+        Width="200"
+        Height="100"
+        CanResize="False"
+        Topmost="True"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        x:Class="ReceiptOverview.Views.SimpleMessageBox">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Name="TxtMessage"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center" />
+
+        <Button Name="BtnConfirm"
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="10,0,5,10"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Background="#0d6efd"
+                Foreground="White"
+                Click="BtnConfirm_OnClick"
+                Content="Confirm" />
+        
+        <Button Name="BtnCancel"
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5,0,10,10"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Background="#6610f2"
+                Foreground="White"
+                Click="BtnCancel_OnClick"
+                Content="Cancel" />
+    </Grid>
+</Window>
