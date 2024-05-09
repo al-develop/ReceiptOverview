@@ -31,11 +31,7 @@ public class ParameterSelector
                 return null!;
         }
     }
-
-    
-    // TODO: I'm unclear, whether the "Value = value" assignments will work as intendet.
-    // Might be, that a cast is necessary --> recheck and if necessary, add casts, before assigning the value.
-    
+  
     // ID - both in Position and Entry
     private static SqliteParameter IdParameter(object value)
     {
