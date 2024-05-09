@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using Microsoft.Data.Sqlite;
 using ReceiptOverview.Models;
 
@@ -70,17 +69,7 @@ public class DataAccess
                 insertCommand.ExecuteNonQuery();
             }
 
-            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestPositionId(), connection))
-            {
-                SqliteDataReader reader = selectCommand.ExecuteReader();
-                if (!reader.HasRows)
-                    return 1;
-
-                while (reader.Read())
-                {
-                    newPositionId = (Int32)reader[ColumnNames.ID];
-                }
-            }
+            newPositionId = GetNextPositionId();
 
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
@@ -89,7 +78,7 @@ public class DataAccess
         return newPositionId;
     }
 
-    public void UpdatePosition(Position position)
+    public int UpdatePosition(Position position)
     {
         using (connection)
         {
@@ -112,6 +101,8 @@ public class DataAccess
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
         }
+
+        return position.Id;
     }
 
     public void DeletePosition(Position position)
@@ -190,10 +181,9 @@ public class DataAccess
             if (connection.State != ConnectionState.Open)
                 connection.Open();
 
-            using (SqliteCommand insertCommand = new(SqlQueries.NewPosition(), connection))
+            using (SqliteCommand insertCommand = new(SqlQueries.NewEntry(), connection))
             {
-                SqliteParameter paramPositionId =
-                    ParameterSelector.GetParameter(ColumnNames.POS_ID, newEntry.PositionId);
+                SqliteParameter paramPositionId = ParameterSelector.GetParameter(ColumnNames.POS_ID, newEntry.PositionId);
                 SqliteParameter paramItem = ParameterSelector.GetParameter(ColumnNames.ITEM, newEntry.Item);
                 SqliteParameter paramCategory = ParameterSelector.GetParameter(ColumnNames.CATEGORY, newEntry.Category);
                 SqliteParameter paramPrice = ParameterSelector.GetParameter(ColumnNames.PRICE, newEntry.Price);
@@ -206,17 +196,7 @@ public class DataAccess
                 insertCommand.ExecuteNonQuery();
             }
 
-            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestPositionId(), connection))
-            {
-                SqliteDataReader reader = selectCommand.ExecuteReader();
-                if (!reader.HasRows)
-                    return 1;
-
-                while (reader.Read())
-                {
-                    newEntryId = (Int32)reader[ColumnNames.ID];
-                }
-            }
+            newEntryId = GetNextEntryId();
 
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
@@ -225,7 +205,7 @@ public class DataAccess
         return newEntryId;
     }
 
-    public void UpdateEntry(Entry entry)
+    public int UpdateEntry(Entry entry)
     {
         using (connection)
         {
@@ -252,6 +232,8 @@ public class DataAccess
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
         }
+
+        return entry.Id;
     }
 
     public void DeleteEntry(Entry entry)
@@ -273,6 +255,8 @@ public class DataAccess
         }
     }
 
+
+    // Helper
     public bool CheckDbConnection()
     {
         bool success;
@@ -282,16 +266,16 @@ public class DataAccess
             {
                 if (connection.State != ConnectionState.Open)
                     connection.Open();
-                
+
                 // Attempt to read the ID of the first position.
                 // if the database has no tables, an exception occurs
                 // if the table exists, but has no entries, 0 will be returned
-                using(SqliteCommand selectCommand = new(SqlQueries.GetFirstPositionId(), connection))
+                using (SqliteCommand selectCommand = new(SqlQueries.GetFirstPositionId(), connection))
                 {
                     SqliteDataReader reader = selectCommand.ExecuteReader();
                     reader.Read();
                 }
-                
+
                 success = true;
             }
         }
@@ -306,5 +290,58 @@ public class DataAccess
         }
 
         return success;
+    }
+
+    private int GetNextPositionId()
+    {
+        int nextPostitionId = 0;
+        using (connection)
+        {
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestPositionId(), connection))
+            {
+                SqliteDataReader reader = selectCommand.ExecuteReader();
+                if (!reader.HasRows)
+                    return nextPostitionId;
+
+                while (reader.Read())
+                {
+                    nextPostitionId = (Int32)reader[ColumnNames.ID];
+                }
+            }
+
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
+
+        return nextPostitionId++;
+    }
+
+    private int GetNextEntryId()
+    {
+        int nextEntryId = 0;
+        using (connection)
+        {
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+            
+            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestEntryId(), connection))
+            {
+                SqliteDataReader reader = selectCommand.ExecuteReader();
+                if (!reader.HasRows)
+                    return nextEntryId;
+
+                while (reader.Read())
+                {
+                    nextEntryId = (Int32)reader[ColumnNames.ID];
+                }
+            }
+
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
+
+        return nextEntryId++;
     }
 }

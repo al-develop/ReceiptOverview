@@ -31,7 +31,7 @@ public static class SqlQueries
 
     public static string GetLatestPositionId()
     {
-	    return $"SELECT {ColumnNames.ID} FROM {POSITION} ORDER BY DESC LIMIT 1";
+	    return $"SELECT {ColumnNames.ID} FROM {POSITION} ORDER BY {ColumnNames.ID} DESC LIMIT 1";
     }
     
     public static string UpdatePosition()
@@ -86,5 +86,10 @@ public static class SqlQueries
 	    builder.AppendLine($"DELETE FROM {ENTRY}");
 	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
+    }
+    
+    public static string GetLatestEntryId()
+    {
+	    return $"SELECT {ColumnNames.ID} FROM {ENTRY} ORDER BY {ColumnNames.ID} DESC LIMIT 1";
     }
 }

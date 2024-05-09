@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DynamicData;
 using ReactiveUI;
 using ReceiptOverview.Logic;
 
@@ -34,6 +33,7 @@ namespace ReceiptOverview.ViewModels
             set
             {
                 this.CanDeleteEntry = true;
+                this.AutofillEntry();
                 this.RaiseAndSetIfChanged(ref _currentEntry, value);
             }
         }
@@ -67,6 +67,7 @@ namespace ReceiptOverview.ViewModels
             set => this.RaiseAndSetIfChanged(ref _mainUiActive, value);
         }
 
+        
         public ICommand NewPositionCommand { get; }
         public ICommand RemovePositionCommand { get; }
         public ICommand NewEntryCommand { get; }
@@ -94,7 +95,7 @@ namespace ReceiptOverview.ViewModels
             RemoveEntryCommand = ReactiveCommand.CreateFromTask(async () => await RemoveEntry());
 
             NewPositionCommand = ReactiveCommand.Create(() => CreateNewPosition());
-            NewEntryCommand = ReactiveCommand.Create(() => CreateNewEntry());
+            NewEntryCommand = ReactiveCommand.Create(() => AddEntry());
             SaveCommand = ReactiveCommand.Create(() => Save());
             ExportToCsvCommand = ReactiveCommand.Create(() => ExportToCsv());
             CheckDbConnectionCommand = ReactiveCommand.Create(async () => await CheckDbConnection());
@@ -116,8 +117,15 @@ namespace ReceiptOverview.ViewModels
         // Called, when CurrentPosition changes
         private void LoadEntries()
         {
-            if (CurrentPosition == null || CurrentPosition.Id == 0)
+            try
+            {
+                if (CurrentPosition == null || CurrentPosition.Id == 0)
+                    return;
+            }
+            catch (Exception)
+            {
                 return;
+            }
 
             if (CurrentPosition.Entries == null || CurrentPosition.Entries.Count == 0)
             {
@@ -134,14 +142,42 @@ namespace ReceiptOverview.ViewModels
 
         private void CreateNewPosition()
         {
-            PositionViewModel newPosition = new();
-            newPosition.Id = 0;
-            newPosition.Date = new DateViewModel(1, 1, 2000);
-            newPosition.Total = string.Empty;
-
-            CurrentPosition = newPosition;
+            // is the month and year were set from a previous position, continue to use them
+            // this makes entering several receipts from the same month of the same year easier
+            int previousMonth = 1;
+            int previousYear = 2000;
+            if (CurrentPosition != null && CurrentPosition.Id != 0)
+            {
+                previousMonth = CurrentPosition.Date.Month;
+                previousYear = CurrentPosition.Date.Year;
+            }
+            
+            CurrentPosition = new();
+            CurrentPosition.Id = 0;
+            CurrentPosition.Date = new DateViewModel(1, previousMonth, previousYear);
+            CurrentPosition.Total = string.Empty;
+            CurrentPosition.Entries = new ObservableCollection<EntryViewModel>();
+            
+            CurrentEntry = new();
+            CurrentEntry.Id = 0;
+            CurrentPosition.Entries.Add(CurrentEntry);
+            
             Positions.Add(CurrentPosition);
             CanDeletePosition = true;
+        }
+
+        private void AddEntry()
+        {
+            int nextId = Logic.SaveEntry(CurrentEntry.VmToModel());
+            // the entry was saved and we got the id.
+            // Before reseting the field, the id in the CurrentPosition.Entries needs to be updated
+            
+            
+            // reset entry fields
+            CurrentEntry = new();
+            CurrentEntry.Id = 0;
+            
+            CanDeleteEntry = true;
         }
 
         private async Task RemovePosition()
@@ -151,8 +187,7 @@ namespace ReceiptOverview.ViewModels
 
             MainUiActive = false;
 
-            bool confirm = await ShowDeleteDialog("Delete Position",
-                $"Are you sure, you want to delete the position {CurrentPosition.Id}?");
+            bool confirm = await ShowDeleteDialog("Delete Position", $"Are you sure, you want to delete the position {CurrentPosition.Id}?");
 
             if (!confirm)
                 return;
@@ -162,22 +197,7 @@ namespace ReceiptOverview.ViewModels
             this.Positions.Remove(CurrentPosition);
             MainUiActive = true;
         }
-
-        private void CreateNewEntry()
-        {
-            CanDeleteEntry = false;
-
-            EntryViewModel newEntry = new();
-            newEntry.Id = 0;
-            newEntry.PositionId = CurrentPosition.Id;
-            newEntry.Item = string.Empty;
-            newEntry.Category = string.Empty;
-            newEntry.Price = string.Empty;
-
-            CurrentEntry = newEntry;
-            CurrentPosition.Entries.Add(CurrentEntry);
-        }
-
+        
         private async Task RemoveEntry()
         {
             if (CurrentEntry == null! || CurrentEntry.Id == 0)
@@ -202,13 +222,13 @@ namespace ReceiptOverview.ViewModels
 
         private void Save()
         {
-            int positionId = Logic.NewPosition(CurrentPosition.VmToModel());
+            int positionId = Logic.SavePosition(CurrentPosition.VmToModel());
             CurrentPosition.Id = positionId;
             
             foreach (var entry in CurrentPosition.Entries)
             {
                 entry.PositionId = positionId;
-                int entryId = Logic.NewEntry(entry.VmToModel());
+                int entryId = Logic.SaveEntry(entry.VmToModel());
                 entry.Id = entryId;
             }
         }
@@ -243,6 +263,20 @@ namespace ReceiptOverview.ViewModels
             SimpleMessageBoxViewModel dialog = new(title, message);
             await ShowDialog.Handle(dialog);
             return dialog.Result;
+        }
+
+        private void AutofillEntry()
+        {
+            // check, if there is any entry with the same Item already stored in other Positions, then take the first
+            // occurence and fill the other fields.
+            // do not use the entry Id for the search, as each entry needs to be a unique database entity, because 
+            // they differ in their PositionId.
+            if (Positions.Any(a => a.Entries.Any(a => a.Item == CurrentEntry.Item)))
+            {
+                // CurrentEntry.Item = Positions.Select(s => s.Entries.Select(s => s.Item).First()).First();
+                CurrentEntry.Category = Positions.Select(s => s.Entries.Select(s => s.Category).First()).First();
+                CurrentEntry.Price = Positions.Select(s => s.Entries.Select(s => s.Price).First()).First();
+            }
         }
     }
 }

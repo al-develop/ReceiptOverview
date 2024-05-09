@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using ReceiptOverview.Data;
 using ReceiptOverview.Models;
 
@@ -32,15 +31,10 @@ public class CentralLogic
         return positions;
     }
 
-
-    public int NewPosition(Position newPosition)
+    public int SavePosition(Position position)
     {
-        return Access.NewPosition(newPosition);
-    }
-
-    public void UpdatePosition(Position position)
-    {
-        Access.UpdatePosition(position);
+        return position.Id == 0 ? Access.NewPosition(position) 
+                                : Access.UpdatePosition(position);
     }
 
     public void DeletePosition(Position position)
@@ -57,9 +51,10 @@ public class CentralLogic
             : Access.GetEntries(positionId);
     }
 
-    public int NewEntry(Entry newEntry)
+    public int SaveEntry(Entry entry)
     {
-        return Access.NewEntry(newEntry);
+        return entry.Id == 0 ? Access.NewEntry(entry)
+                             : Access.UpdateEntry(entry);
     }
 
     public void UpdateEntry(Entry entry)
@@ -76,4 +71,5 @@ public class CentralLogic
     {
         return File.Exists(dbPath) && Access.CheckDbConnection();
     }
+
 }

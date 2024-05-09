@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices.JavaScript;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
 using ReactiveUI;
 using ReceiptOverview.Models;
 
@@ -23,7 +22,11 @@ public class PositionViewModel : ViewModelBase
     public ObservableCollection<EntryViewModel> Entries
     {
         get => _entries;
-        set => this.RaiseAndSetIfChanged(ref _entries, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _entries, value);
+            this.Total = Entries.Sum(s => decimal.Parse(s.Price)).ToString();
+        }
     }
 
     public string Total

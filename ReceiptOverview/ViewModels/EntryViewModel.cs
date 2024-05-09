@@ -10,7 +10,7 @@ public class EntryViewModel : ViewModelBase
     private string _item;
     private string _price;
     private string _category;
-    
+
     public string Category
     {
         get => _category;
@@ -56,7 +56,7 @@ public class EntryViewModel : ViewModelBase
         mapped.Price = decimal.Parse(this.Price);
         return mapped;
     }
-    
+
     public void ModelToVm(Entry entry)
     {
         this.Id = entry.Id;
