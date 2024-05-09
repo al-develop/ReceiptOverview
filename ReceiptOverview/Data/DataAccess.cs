@@ -9,14 +9,13 @@ namespace ReceiptOverview.Data;
 
 public class DataAccess
 {
-    private const int NO_FILTER = -1;
     private readonly string connectionString;
     private static readonly string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "data.db");
     private SqliteConnection connection;
 
     public DataAccess()
     {
-        this.connectionString = $"Data Source={dbPath};Version=3";
+        this.connectionString = $"Data Source={dbPath};";
         connection = new SqliteConnection(connectionString);
     }
 
