@@ -80,6 +80,23 @@
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
+            <MenuItem IsTabStop="False" Command="{Binding CheckDbConnectionCommand}">
+                <MenuItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Image Width="18"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Height="18"
+                                   Source="avares://ReceiptOverview/Assets/database.png" />
+                            <TextBlock Text="  Check DB Connection"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </MenuItem.HeaderTemplate>
+            </MenuItem>
         </Menu>
 
         <Separator Grid.Row="0"

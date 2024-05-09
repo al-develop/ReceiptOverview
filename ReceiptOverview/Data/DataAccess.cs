@@ -153,7 +153,7 @@ public class DataAccess
             using (SqliteCommand selectCommand = new(SqlQueries.GetEntriesForPosition(), connection))
             {
                 selectCommand.Parameters.Add(ParameterSelector.GetParameter(ColumnNames.POS_ID, positionId));
-                
+
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
                     return new List<Entry>();
@@ -174,14 +174,15 @@ public class DataAccess
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
         }
+
         return resultSet;
     }
-    
+
     public List<Entry> GetEntries(int positionId)
     {
         return GetAllEntries(positionId);
     }
-    
+
     public int NewEntry(Entry newEntry)
     {
         int newEntryId = 0;
@@ -271,5 +272,31 @@ public class DataAccess
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
         }
+    }
+
+    public bool CheckDbConnection()
+    {
+        bool success;
+        try
+        {
+            // Attempt to open a connection to the database
+            using (connection)
+            {
+                if (connection.State != ConnectionState.Open)
+                    connection.Open();
+                success = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            success = false;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
+
+        return success;
     }
 }

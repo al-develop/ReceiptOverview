@@ -10,6 +10,21 @@ public class SimpleMessageBoxViewModel : ViewModelBase
 
     private string _title;
     private string _message;
+    private bool _cancelVisible;
+    private int _btnConfirmColumnSpan;
+    
+    public int BtnConfirmColumnSpan
+    {
+        get => _btnConfirmColumnSpan;
+        set => this.RaiseAndSetIfChanged(ref _btnConfirmColumnSpan, value);
+    }
+
+    public bool CancelVisible
+    {
+        get => _cancelVisible;
+        set => this.RaiseAndSetIfChanged(ref _cancelVisible, value);
+    }
+
     public string Message
     {
         get => _message;
@@ -29,10 +44,12 @@ public class SimpleMessageBoxViewModel : ViewModelBase
         
     }
     
-    public SimpleMessageBoxViewModel(string _title, string _message)
+    public SimpleMessageBoxViewModel(string title, string message, bool displayCancelButton = true)
     {
-        this.Title = _title;
-        this.Message = _message;
+        this.CancelVisible = displayCancelButton;
+        this.BtnConfirmColumnSpan = displayCancelButton ? 1 : 2;
+        this.Title = title;
+        this.Message = message;
 
         ConfirmCommand = ReactiveCommand.Create(() => { Result = true; return Result; });
         CancelCommand = ReactiveCommand.Create(() => { Result = true; return Result; });

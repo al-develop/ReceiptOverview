@@ -3,6 +3,7 @@ using Avalonia.ReactiveUI;
 using ReactiveUI;
 using ReceiptOverview.ViewModels;
 using System;
+using Avalonia.Threading;
 
 namespace ReceiptOverview.Views
 {

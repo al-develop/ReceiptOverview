@@ -57,4 +57,9 @@ public class CentralLogic
     {
         access.DeleteEntry(entry);
     }
+
+    public bool CheckDbConnection()
+    {
+        return access.CheckDbConnection();
+    }
 }
