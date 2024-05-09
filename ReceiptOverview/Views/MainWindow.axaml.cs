@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using ReceiptOverview.ViewModels;
@@ -9,13 +8,13 @@ namespace ReceiptOverview.Views;
 
 public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
-    private MainWindowViewModel vm;
+    // private MainWindowViewModel vm;
     public MainWindow()
     {
         InitializeComponent();
-        vm = new MainWindowViewModel();
-        this.DataContext = vm;
-
+        // vm = new MainWindowViewModel();
+        // this.DataContext = vm;
+        
         this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowMessageBox)));
     }
 
