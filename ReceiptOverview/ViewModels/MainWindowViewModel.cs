@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using DynamicData;
 using ReactiveUI;
 using ReceiptOverview.Logic;
 
@@ -139,6 +140,7 @@ namespace ReceiptOverview.ViewModels
             newPosition.Total = string.Empty;
 
             CurrentPosition = newPosition;
+            Positions.Add(CurrentPosition);
             CanDeletePosition = true;
         }
 
@@ -173,6 +175,7 @@ namespace ReceiptOverview.ViewModels
             newEntry.Price = string.Empty;
 
             CurrentEntry = newEntry;
+            CurrentPosition.Entries.Add(CurrentEntry);
         }
 
         private async Task RemoveEntry()
@@ -201,15 +204,13 @@ namespace ReceiptOverview.ViewModels
         {
             int positionId = Logic.NewPosition(CurrentPosition.VmToModel());
             CurrentPosition.Id = positionId;
-
+            
             foreach (var entry in CurrentPosition.Entries)
             {
                 entry.PositionId = positionId;
                 int entryId = Logic.NewEntry(entry.VmToModel());
                 entry.Id = entryId;
             }
-
-            Positions.Add(CurrentPosition);
         }
 
         private void ExportToCsv()

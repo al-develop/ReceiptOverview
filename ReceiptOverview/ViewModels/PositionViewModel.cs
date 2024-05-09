@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices.JavaScript;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReactiveUI;
 using ReceiptOverview.Models;
 
@@ -27,7 +28,12 @@ public class PositionViewModel : ViewModelBase
 
     public string Total
     {
-        get => _total;
+        get
+        {
+            if (string.IsNullOrEmpty(_total))
+                _total = 0.0m.ToString();
+            return _total;
+        }
         set => this.RaiseAndSetIfChanged(ref _total, value);
     }
 

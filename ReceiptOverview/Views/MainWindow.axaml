@@ -303,7 +303,7 @@
                 </DockPanel>
 
                 <DataGrid IsReadOnly="True"
-                          ItemsSource="{Binding CurrentPosition.Entries}"
+                          ItemsSource="{Binding CurrentPosition.Entries, Mode=TwoWay}"
                           SelectedItem="{Binding CurrentEntry}"
                           Margin="0,0,10,0"
                           VerticalAlignment="Stretch"

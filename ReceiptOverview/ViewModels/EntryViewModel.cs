@@ -19,7 +19,12 @@ public class EntryViewModel : ViewModelBase
 
     public string Price
     {
-        get => _price;
+        get
+        {
+            if (string.IsNullOrEmpty(_price))
+                _price = 0.0m.ToString();
+            return _price;
+        }
         set => this.RaiseAndSetIfChanged(ref _price, value);
     }
 
