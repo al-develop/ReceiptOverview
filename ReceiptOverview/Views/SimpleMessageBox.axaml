@@ -4,8 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:ReceiptOverview.ViewModels"
         mc:Ignorable="d"
-        Width="360"
-        Height="120"
+        Width="720"
+        Height="140"
         CanResize="False"
         Topmost="True"
         WindowStartupLocation="CenterOwner"
@@ -21,12 +21,12 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="80" />
             <RowDefinition Height="60" />
-            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="170" />
-            <ColumnDefinition Width="170" />
+            <ColumnDefinition Width="340" />
+            <ColumnDefinition Width="340" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Name="TxtMessage"

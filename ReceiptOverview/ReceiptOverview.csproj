@@ -25,4 +25,11 @@
         <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.4" />
         <PackageReference Include="SQLite" Version="3.13.0" />
     </ItemGroup>
+
+
+    <ItemGroup>
+      <None Update="Data\create_db.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
@@ -220,11 +221,20 @@ namespace ReceiptOverview.ViewModels
             bool success = Logic.CheckDbConnection();
             string title = "Checking connection to the Database";
             string message = string.Empty;
-
-            message = success ? "Connection successfull" : "Connection failed\nCheck if /Data/data.db exists.";
+            message = success ? "Connection successfull" : GetConnectionErrorMessage();
 
             SimpleMessageBoxViewModel dialog = new(title, message, false);
             await ShowDialog.Handle(dialog);
+        }
+
+        private string GetConnectionErrorMessage()
+        {
+            StringBuilder errorMessage = new();
+            errorMessage.AppendLine("Connection failed. Please verify that");
+            errorMessage.AppendLine("   - /Data/data.db exists");
+            errorMessage.AppendLine("   - all tables were created. Run 'create_db.sql' on an existing, but empty data.db file to create tables.");
+            errorMessage.AppendLine("('create_db.sql' can be found in the /Data/ directory of the application)");
+            return errorMessage.ToString();
         }
 
         private async Task<bool> ShowDeleteDialog(string title, string message)

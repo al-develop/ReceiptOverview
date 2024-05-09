@@ -7,12 +7,20 @@ public static class SqlQueries
     private const string POSITION = "Position";
     private const string ENTRY = "Entry";
     
+    // For connection tests
+    public static string GetFirstPositionId()
+    {
+	    return $"SELECT {ColumnNames.ID} FROM {POSITION} LIMIT 1";
+    }
+    
     // CRUD Positions
     public static string GetPositions()
     {
         return $"SELECT * FROM {POSITION}";
     }
 
+    
+    
     public static string NewPosition()
     {
         StringBuilder builder = new StringBuilder();
@@ -23,7 +31,7 @@ public static class SqlQueries
 
     public static string GetLatestPositionId()
     {
-	    return $"SELECT TOP 1 {ColumnNames.ID} FROM {POSITION} ORDER BY DESC";
+	    return $"SELECT {ColumnNames.ID} FROM {POSITION} ORDER BY DESC LIMIT 1";
     }
     
     public static string UpdatePosition()

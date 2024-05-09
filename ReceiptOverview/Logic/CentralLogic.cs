@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using ReceiptOverview.Data;
 using ReceiptOverview.Models;
 
@@ -6,33 +9,44 @@ namespace ReceiptOverview.Logic;
 
 public class CentralLogic
 {
-    private DataAccess access;
+    private DataAccess Access { get; }
+    private readonly string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "data.db");
 
     public CentralLogic()
     {
-        access = new DataAccess();
+        Access = new DataAccess(dbPath);
     }
 
     public List<Position> GetPositions()
     {
-        return access.GetPositions();
+        List<Position> positions;
+        try
+        {
+            positions = Access.GetPositions();
+        }
+        catch (Exception)
+        {
+            positions = new();
+        }
+
+        return positions;
     }
 
 
     public int NewPosition(Position newPosition)
     {
-        return access.NewPosition(newPosition);
+        return Access.NewPosition(newPosition);
     }
 
     public void UpdatePosition(Position position)
     {
-        access.UpdatePosition(position);
+        Access.UpdatePosition(position);
     }
 
     public void DeletePosition(Position position)
     {
         // on deletion of a position, the data layer handles the deletion of entries associated to a Position
-        access.DeletePosition(position);
+        Access.DeletePosition(position);
     }
 
     // CRUD Entries
@@ -40,26 +54,26 @@ public class CentralLogic
     {
         return positionId == 0
             ? new List<Entry>()
-            : access.GetEntries(positionId);
+            : Access.GetEntries(positionId);
     }
 
     public int NewEntry(Entry newEntry)
     {
-        return access.NewEntry(newEntry);
+        return Access.NewEntry(newEntry);
     }
 
     public void UpdateEntry(Entry entry)
     {
-        access.UpdateEntry(entry);
+        Access.UpdateEntry(entry);
     }
 
     public void DeleteEntry(Entry entry)
     {
-        access.DeleteEntry(entry);
+        Access.DeleteEntry(entry);
     }
 
     public bool CheckDbConnection()
     {
-        return access.CheckDbConnection();
+        return File.Exists(dbPath) && Access.CheckDbConnection();
     }
 }

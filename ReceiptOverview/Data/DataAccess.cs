@@ -10,10 +10,9 @@ namespace ReceiptOverview.Data;
 public class DataAccess
 {
     private readonly string connectionString;
-    private static readonly string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "data.db");
     private SqliteConnection connection;
 
-    public DataAccess()
+    public DataAccess(string dbPath)
     {
         this.connectionString = $"Data Source={dbPath};";
         connection = new SqliteConnection(connectionString);
@@ -279,11 +278,20 @@ public class DataAccess
         bool success;
         try
         {
-            // Attempt to open a connection to the database
             using (connection)
             {
                 if (connection.State != ConnectionState.Open)
                     connection.Open();
+                
+                // Attempt to read the ID of the first position.
+                // if the database has no tables, an exception occurs
+                // if the table exists, but has no entries, 0 will be returned
+                using(SqliteCommand selectCommand = new(SqlQueries.GetFirstPositionId(), connection))
+                {
+                    SqliteDataReader reader = selectCommand.ExecuteReader();
+                    reader.Read();
+                }
+                
                 success = true;
             }
         }
