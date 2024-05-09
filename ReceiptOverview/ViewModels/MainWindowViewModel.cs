@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
 
@@ -10,31 +12,47 @@ namespace ReceiptOverview.ViewModels
         private PositionViewModel _currentPosition;
         private EntryViewModel _currentEntry;
         private ObservableCollection<PositionViewModel> _positions;
-
+        private bool _mainUiActive;
+        private bool _canDeletePosition;
+        private bool _canDeleteEntry;
+        
         public ObservableCollection<PositionViewModel> Positions
         {
             get => _positions;
             set => this.RaiseAndSetIfChanged(ref _positions, value);
         }
-
         public EntryViewModel CurrentEntry
         {
             get => _currentEntry;
-            set => this.RaiseAndSetIfChanged(ref _currentEntry, value);
+            set
+            {
+                this.CanDeleteEntry = true;
+                this.RaiseAndSetIfChanged(ref _currentEntry, value);
+            }
         }
-
         public PositionViewModel CurrentPosition
         {
             get => _currentPosition;
-            set => this.RaiseAndSetIfChanged(ref _currentPosition, value);
+            set
+            {
+                this.CanDeletePosition = true;
+                this.RaiseAndSetIfChanged(ref _currentPosition, value);
+            }
         }
-
-        private bool _canEdit;
-
-        public bool CanEdit
+        public bool CanDeleteEntry
         {
-            get => _canEdit;
-            set => this.RaiseAndSetIfChanged(ref _canEdit, value);
+            get => _canDeleteEntry;
+            set => this.RaiseAndSetIfChanged(ref _canDeleteEntry, value);
+        }
+        public bool CanDeletePosition
+        {
+            get => _canDeletePosition;
+            set => this.RaiseAndSetIfChanged(ref _canDeletePosition, value);
+        }
+        public bool MainUiActive
+        {
+            get => _mainUiActive;
+            set => this.RaiseAndSetIfChanged(ref _mainUiActive, value);
         }
         public ICommand NewPositionCommand { get; }
         public ICommand RemovePositionCommand { get; }
@@ -43,23 +61,26 @@ namespace ReceiptOverview.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand ExportToCsvCommand { get; }
 
-        public Func<int, bool> DialogAction { get; set; }
+        public Interaction<SimpleMessageBoxViewModel, bool?> ShowDialog { get; }
         
         public MainWindowViewModel()
         {
-            CanEdit = true;
+            MainUiActive = true;
+            CanDeleteEntry = false;
+            CanDeletePosition = false;
             
             Positions = new ObservableCollection<PositionViewModel>();
             CurrentPosition = new PositionViewModel();
             CurrentEntry = new EntryViewModel();
+            ShowDialog = new Interaction<SimpleMessageBoxViewModel, bool?>();
 
+            RemovePositionCommand = ReactiveCommand.CreateFromTask(async () => RemovePosition());
+            RemoveEntryCommand = ReactiveCommand.Create(() => RemoveEntry());
+            
             NewPositionCommand = ReactiveCommand.Create(() => CreateNewPosition());
-            RemovePositionCommand = ReactiveCommand.Create((object o) => RemovePosition(o));
             NewEntryCommand = ReactiveCommand.Create(() => CreateNewEntry());
-            RemoveEntryCommand = ReactiveCommand.Create((object o) => RemoveEntry(o));
             SaveCommand = ReactiveCommand.Create(() => Save());
             ExportToCsvCommand = ReactiveCommand.Create(() => ExportToCsv());
-            
             LoadPositions();
         }   
 
@@ -77,21 +98,47 @@ namespace ReceiptOverview.ViewModels
 
         private void CreateNewPosition()
         {
+            CanDeleteEntry = false;
         }
 
-        private void RemovePosition(object param)
+        private async void RemovePosition()
         {
-            CanEdit = false;
-            bool confirm = DialogAction.Invoke(CurrentPosition.Id);
-            CanEdit = true;
+            if(CurrentPosition == null! || CurrentPosition.Id == 0)
+                return;
+            
+            MainUiActive = false;
+
+            bool confirm = await ShowDeleteDialog("Delete Position", $"Are you sure, you want to delete the position {CurrentPosition.Id}?");
+            
+            if(!confirm)
+                return;
+            
+            // Code to remove a position from the collection
+            
+            MainUiActive = true;
         }
 
         private void CreateNewEntry()
         {
         }
 
-        private void RemoveEntry(object param)
+        private async void RemoveEntry()
         {
+            if(CurrentEntry == null! || CurrentEntry.Id == 0)
+                return;
+            
+            MainUiActive = false;
+
+            SimpleMessageBoxViewModel dialog = new("Delete Entry", $"Are you sure, you want to delete the entry {CurrentEntry.Id}?");
+            await ShowDialog.Handle(dialog);
+            bool confirm = dialog.Result;
+            
+            if(!confirm)
+                return;
+            
+            // Code to remove an entry from the collection
+            
+            MainUiActive = true;
         }
 
         private void Save()
@@ -100,6 +147,13 @@ namespace ReceiptOverview.ViewModels
 
         private void ExportToCsv()
         {
+        }
+
+        private async Task<bool> ShowDeleteDialog(string title, string message)
+        {
+            SimpleMessageBoxViewModel dialog = new(title, message);
+            await ShowDialog.Handle(dialog);
+            return dialog.Result;
         }
     }
 }

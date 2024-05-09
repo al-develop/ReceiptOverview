@@ -1,23 +1,30 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.ReactiveUI;
+using ReactiveUI;
 using ReceiptOverview.ViewModels;
 
 namespace ReceiptOverview.Views;
 
-public partial class MainWindow : Window
+public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
-    public MainWindowViewModel MainVM { get; set; }
+    private MainWindowViewModel vm;
     public MainWindow()
     {
         InitializeComponent();
-        this.DataContext = MainVM = new MainWindowViewModel();
-        this.MainVM.DialogAction = new Func<int, bool>(ShowDialog);
+        vm = new MainWindowViewModel();
+        this.DataContext = vm;
+
+        this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(ShowMessageBox)));
     }
 
-    private bool ShowDialog(int positionId)
+    private async Task ShowMessageBox(InteractionContext<SimpleMessageBoxViewModel, bool?> interaction)
     {
-        SimpleMessageBox box = new SimpleMessageBox($"Delete Position {positionId}", $"Are you sure, you want to delete the Position {positionId}?");
-        box.ShowDialog(this);
-        return box.Result;
+        var dialog = new SimpleMessageBox();
+        dialog.DataContext = interaction.Input;
+
+        var result = await dialog.ShowDialog<bool?>(this);
+        interaction.SetOutput(result);
     }
 }

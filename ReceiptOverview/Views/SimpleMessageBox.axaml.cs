@@ -1,29 +1,26 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using ReactiveUI;
+using ReceiptOverview.ViewModels;
+using System;
 
 namespace ReceiptOverview.Views
 {
-    public partial class SimpleMessageBox : Window
+    public partial class SimpleMessageBox : ReactiveWindow<SimpleMessageBoxViewModel>
     {
-        public bool Result { get; set; }
-        public SimpleMessageBox(string title, string message)
+        public SimpleMessageBox()
         {
             InitializeComponent();
-            this.Title = title;
-            this.TxtMessage.Text = message;
-        }
-        private void BtnConfirm_OnClick(object? sender, RoutedEventArgs e)
-        {
-            this.Result = true;
-            Close();
+            if (Design.IsDesignMode) 
+                return;
+            
+            this.WhenActivated(action => action(ViewModel!.ConfirmCommand.Subscribe(Close)));
+            this.WhenActivated(action => action(ViewModel!.CancelCommand.Subscribe(Close)));
         }
 
-        private void BtnCancel_OnClick(object? sender, RoutedEventArgs e)
+        private void Close(bool messageBoxResult)
         {
-            this.Result = false;
-            Close();
+            this.Close();
         }
     }
 }

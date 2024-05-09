@@ -2,27 +2,35 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:ReceiptOverview.ViewModels"
         mc:Ignorable="d"
-        d:DesignWidth="800"
-        d:DesignHeight="450"
-        Width="200"
-        Height="100"
+        Width="360"
+        Height="120"
         CanResize="False"
         Topmost="True"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        x:Class="ReceiptOverview.Views.SimpleMessageBox">
-    <Grid>
+        Title="{Binding Title}"
+        x:Class="ReceiptOverview.Views.SimpleMessageBox"
+        x:DataType="viewModels:SimpleMessageBoxViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <viewModels:SimpleMessageBoxViewModel />
+    </Design.DataContext>
+    
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100" />
-            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="170" />
+            <ColumnDefinition Width="170" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Name="TxtMessage"
+                   Text="{Binding Message}"
                    Grid.Row="0"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
@@ -31,24 +39,20 @@
 
         <Button Name="BtnConfirm"
                 Grid.Row="1"
-                Grid.Column="0"
+                Grid.Column="0" Command="{Binding ConfirmCommand}"
                 Margin="10,0,5,10"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
-                Background="#0d6efd"
-                Foreground="White"
-                Click="BtnConfirm_OnClick"
                 Content="Confirm" />
         
-        <Button Name="BtnCancel"
+        <Button Name="BtnCancel" Command="{Binding CancelCommand}"
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="5,0,10,10"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
-                Background="#6610f2"
-                Foreground="White"
-                Click="BtnCancel_OnClick"
+                Background="#684fa3"
+                Foreground="WhiteSmoke"
                 Content="Cancel" />
     </Grid>
 </Window>

@@ -11,7 +11,7 @@
         Height="600"
         MinWidth="800"
         MinHeight="700"
-        IsEnabled="{Binding CanEdit}"
+        IsEnabled="{Binding MainUiActive}"
         x:Class="ReceiptOverview.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="avares://ReceiptOverview/Assets/avalonia-logo.ico"
@@ -37,33 +37,48 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
-            <RowDefinition Height="*"/> 
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="350" />
             <ColumnDefinition Width="450*" />
         </Grid.ColumnDefinitions>
-        
-        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Margin="10,0,0,0">
+
+        <Menu Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Margin="10,0,0,0">
             <MenuItem Command="{Binding ExportToCsvCommand}"
                       IsTabStop="False">
                 <MenuItem.HeaderTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center">
-                            <Image Width="16" VerticalAlignment="Center" Margin="10,0 ,5,0"  HorizontalAlignment="Center"
-                                   Height="16"
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Image Width="18"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Height="18"
                                    Source="avares://ReceiptOverview/Assets/csv.png" />
-                            <TextBlock Text="CSV" HorizontalAlignment="Center" />
+                            <TextBlock Text="  CSV"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
                         </StackPanel>
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
         </Menu>
-        
-        <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="10,10,0,0"/>
+
+        <Separator Grid.Row="0"
+                   Grid.ColumnSpan="2"
+                   Grid.Column="0"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Stretch"
+                   Margin="10,10,10,0" />
 
         <!-- Positions ; Left Side -->
-        <DockPanel Grid.Row="1" Grid.Column="0" Margin="10,10,0,10"
+        <DockPanel Grid.Row="1"
+                   Grid.Column="0"
+                   Margin="10,10,0,10"
                    LastChildFill="True">
             <StackPanel DockPanel.Dock="Top"
                         Orientation="Horizontal">
@@ -84,8 +99,31 @@
                                                VerticalAlignment="Center"
                                                Margin="5,0,5,0" />
                                     <Image Source="avares://ReceiptOverview/Assets/add.png"
-                                           Width="16"
-                                           Height="16" />
+                                           Width="18"
+                                           Height="18" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button HorizontalAlignment="Center"
+                        IsEnabled="{Binding CanDeletePosition}"
+                        Command="{Binding RemovePositionCommand}">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Border Background="#684fa3"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    BorderThickness="8"
+                                    CornerRadius="3">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Delete Selected Position"
+                                               VerticalAlignment="Center"
+                                               Foreground="WhiteSmoke"
+                                               Margin="5,0,5,0" />
+                                    <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                           Width="18"
+                                           Height="18" />
                                 </StackPanel>
                             </Border>
                         </ControlTemplate>
@@ -100,53 +138,43 @@
                       HorizontalAlignment="Stretch"
                       IsTabStop="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Date" IsReadOnly="True"
+                    <DataGridTextColumn Header="Date"
+                                        IsReadOnly="True"
                                         Binding="{Binding Date}" />
-                    <DataGridTextColumn Header="Total" IsReadOnly="True"
+                    <DataGridTextColumn Header="Total"
+                                        IsReadOnly="True"
                                         Binding="{Binding Total}" />
-                    <DataGridTemplateColumn Header="Remove">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button HorizontalAlignment="Center"
-                                        Command="{Binding MainVM.RemovePositionCommand, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}">
-                                    <Button.Template>
-                                        <ControlTemplate>
-                                            <Image Source="avares://ReceiptOverview/Assets/delete.png"
-                                                   Width="16"
-                                                   Height="16" />
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-
         </DockPanel>
 
         <!-- Entries ; Right Side -->
-        <DockPanel DockPanel.Dock="Right" Grid.Row="1"
+        <DockPanel DockPanel.Dock="Right"
+                   Grid.Row="1"
                    Grid.Column="1"
                    Margin="10,10,10,10">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Stretch">
-                    <TextBlock Text="Position ID: "
+                    <TextBlock Text="Position ID:    "
+                               FontSize="18"
                                VerticalAlignment="Center"
                                FontStyle="Italic"
                                Foreground="Gray" />
                     <TextBlock VerticalAlignment="Center"
+                               FontSize="18"
                                Text="{Binding CurrentPosition.Id, Mode=TwoWay}"
                                FontStyle="Italic"
                                Foreground="Gray" />
-
-                    <TextBlock Text="Total: "
+                    <Separator Width="1"
+                               Height="18" />
+                    <TextBlock Text="Total:     "
+                               FontSize="18"
                                VerticalAlignment="Center"
-                               Margin="20,0,0,0"
                                FontStyle="Italic"
                                Foreground="Gray" />
                     <TextBlock VerticalAlignment="Center"
+                               FontSize="18"
                                FontWeight="Bold"
                                FontStyle="Italic"
                                Text="{Binding CurrentPosition.Total, Mode=TwoWay}"
@@ -169,34 +197,59 @@
                          TabIndex="2" />
 
                 <DockPanel HorizontalAlignment="Right"
-                           Width="150"
                            Margin="0,5,0,25">
-                    <Button Margin="5,0,10,0"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding NewEntryCommand}"
-                            IsTabStop="False"
-                            Name="BtnAdd"
-                            HotKey="Enter">
-                        <Button.Template>
-                            <ControlTemplate>
-                                <Border Background="{TemplateBinding Background}"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Stretch"
-                                        BorderThickness="8"
-                                        CornerRadius="3">
-                                    <StackPanel Orientation="Horizontal"
-                                                HorizontalAlignment="Center">
-                                        <TextBlock Text="Add"
-                                                   VerticalAlignment="Center"
-                                                   Margin="5,0,5,0" />
-                                        <Image Source="avares://ReceiptOverview/Assets/add.png"
-                                               Width="16"
-                                               Height="16" />
-                                    </StackPanel>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="5,0,10,0"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding NewEntryCommand}"
+                                IsTabStop="False"
+                                Name="BtnAdd"
+                                HotKey="Enter">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Border Background="{TemplateBinding Background}"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Stretch"
+                                            BorderThickness="8"
+                                            CornerRadius="3">
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center">
+                                            <TextBlock Text="Add"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,0,5,0" />
+                                            <Image Source="avares://ReceiptOverview/Assets/add.png"
+                                                   Width="18"
+                                                   Height="18" />
+                                        </StackPanel>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <Button Command="{Binding RemoveEntryCommand}"
+                                IsEnabled="{Binding CanDeletePosition}"
+                                Background="#684fa3">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Border Background="{TemplateBinding Background}"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Stretch"
+                                            BorderThickness="8"
+                                            CornerRadius="3">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Delete Selected Entry"
+                                                       Foreground="WhiteSmoke"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,0,5,0" />
+                                            <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                                   Width="18"
+                                                   Height="18" />
+                                        </StackPanel>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
                 </DockPanel>
 
                 <DataGrid IsReadOnly="True"
@@ -213,20 +266,6 @@
                                             Binding="{Binding Price}" />
                         <DataGridTextColumn Header="Category"
                                             Binding="{Binding Category}" />
-                        <DataGridTemplateColumn Header="Delete Entry">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button
-                                        Command="{Binding MainVM.RemoveEntryCommand, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}">
-                                        <ControlTemplate>
-                                            <Image Source="avares://ReceiptOverview/Assets/delete.png"
-                                                   Width="16"
-                                                   Height="16" />
-                                        </ControlTemplate>
-                                    </Button>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -249,8 +288,8 @@
                                                    VerticalAlignment="Center"
                                                    Margin="5,0,5,0" />
                                         <Image Source="avares://ReceiptOverview/Assets/add.png"
-                                               Width="16"
-                                               Height="16" />
+                                               Width="18"
+                                               Height="18" />
                                     </StackPanel>
                                 </Border>
                             </ControlTemplate>
