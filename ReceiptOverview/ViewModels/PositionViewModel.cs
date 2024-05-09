@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices.JavaScript;
 using ReactiveUI;
@@ -42,5 +43,28 @@ public class PositionViewModel : ViewModelBase
         Date.Year = date.Year;
         Date.Month = date.Month;
         Date.Day = date.Day;
+    }
+
+    public Position VmToModel()
+    {
+        Position mapped = new Position();
+        mapped.Id = this.Id;
+        mapped.Date = new DateTime(Date.Year, Date.Month, Date.Day);
+        mapped.Total = decimal.Parse(this.Total);
+        mapped.Entries = new List<Entry>();
+        foreach (var entryViewModel in this.Entries)
+        {
+            Entry entry = entryViewModel.VmToModel();
+            mapped.Entries.Add(entry);
+        }
+
+        return mapped;
+    }
+
+    public void ModelToVm(Position position)
+    {
+        this.Id = position.Id;
+        this.Date = new DateViewModel(position.Date);
+        this.Total = position.Total.ToString();
     }
 }

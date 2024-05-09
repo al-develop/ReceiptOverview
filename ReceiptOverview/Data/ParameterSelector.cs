@@ -26,6 +26,7 @@ public class ParameterSelector
                 return CategoryParameter(value);
             case ColumnNames.PRICE:
                 return PriceParameter(value);
+            
             default:
                 return null!;
         }
@@ -76,8 +77,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Date,
-            SourceColumn = ColumnNames.DATE,
-            ParameterName = "@date",
+            SourceColumn = ColumnNames.POS_ID,
+            ParameterName = "@positionId",
             Value = value
         };
     }
@@ -87,8 +88,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.TOTAL,
-            ParameterName = "@total",
+            SourceColumn = ColumnNames.ITEM,
+            ParameterName = "@item",
             Value = value
         };
     }
@@ -98,8 +99,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.TOTAL,
-            ParameterName = "@total",
+            SourceColumn = ColumnNames.CATEGORY,
+            ParameterName = "@category",
             Value = value
         };
     }
@@ -109,8 +110,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.TOTAL,
-            ParameterName = "@total",
+            SourceColumn = ColumnNames.PRICE,
+            ParameterName = "@price",
             Value = value
         };
     }

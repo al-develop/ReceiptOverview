@@ -16,23 +16,23 @@ public static class SqlQueries
     public static string NewPosition()
     {
         StringBuilder builder = new StringBuilder();
-        builder.AppendLine($"INSERT INTO {POSITION} (Date, Total) ");
+        builder.AppendLine($"INSERT INTO {POSITION} ({ColumnNames.DATE}, {ColumnNames.TOTAL}) ");
         builder.AppendLine("VALUES @date, @total");
         return builder.ToString();
     }
 
     public static string GetLatestPositionId()
     {
-	    return $"SELECT TOP 1 ID FROM {POSITION} ORDER BY DESC";
+	    return $"SELECT TOP 1 {ColumnNames.ID} FROM {POSITION} ORDER BY DESC";
     }
     
     public static string UpdatePosition()
     {
 	    StringBuilder builder = new StringBuilder();
 	    builder.AppendLine($"UPDATE {POSITION} ");
-	    builder.AppendLine("SET Date = @new_date");
-	    builder.AppendLine("SET Total = @new_total");
-	    builder.AppendLine("WHERE ID = @id");
+	    builder.AppendLine($"SET {ColumnNames.DATE} = @date");
+	    builder.AppendLine($"SET {ColumnNames.TOTAL} = @total");
+	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
     }
 
@@ -40,23 +40,24 @@ public static class SqlQueries
     {
 	    StringBuilder builder = new StringBuilder();
 	    builder.AppendLine($"DELETE FROM {POSITION}");
-	    builder.AppendLine("WHERE ID = @id");
+	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
     }
     
     
     // CRUD Entries
-    public static string GetEntries()
+    public static string GetEntriesForPosition()
     {
-	    string query = $"SELECT * FROM {ENTRY}";
-	    return query;
+	    StringBuilder builder = new StringBuilder();
+	    builder.AppendLine($"SELECT * FROM {ENTRY}");
+	    builder.AppendLine($"WHERE {ColumnNames.POS_ID} = @positionId");
+	    return builder.ToString();
     }
-
     public static string NewEntry()
     {
 	    StringBuilder builder = new StringBuilder();
-	    builder.AppendLine($"INSERT INTO {ENTRY} (ID, Title, Category, Price) ");
-	    builder.AppendLine("VALUES @id, @title, @category, @price");
+	    builder.AppendLine($"INSERT INTO {ENTRY} ({ColumnNames.ID}, {ColumnNames.POS_ID}, {ColumnNames.ITEM}, {ColumnNames.CATEGORY}, {ColumnNames.PRICE}) ");
+	    builder.AppendLine("VALUES @id, @positionId, @item, @category, @price");
 	    return builder.ToString();
     }
 
@@ -64,10 +65,10 @@ public static class SqlQueries
     {
 	    StringBuilder builder = new StringBuilder();
 	    builder.AppendLine($"UPDATE {ENTRY} ");
-	    builder.AppendLine("SET Title = @n_title");
-	    builder.AppendLine("SET Category = @n_category");
-	    builder.AppendLine("SET Price = @n_price");
-	    builder.AppendLine("WHERE ID = @id");
+	    builder.AppendLine($"SET {ColumnNames.ITEM} = @title");
+	    builder.AppendLine($"SET {ColumnNames.CATEGORY} = @category");
+	    builder.AppendLine($"SET {ColumnNames.PRICE} = @price");
+	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
     }
 
@@ -75,7 +76,7 @@ public static class SqlQueries
     {
 	    StringBuilder builder = new StringBuilder();
 	    builder.AppendLine($"DELETE FROM {ENTRY}");
-	    builder.AppendLine("WHERE ID = @id");
+	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
     }
 }

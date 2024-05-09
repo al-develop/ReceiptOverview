@@ -1,4 +1,5 @@
 using ReactiveUI;
+using ReceiptOverview.Models;
 
 namespace ReceiptOverview.ViewModels;
 
@@ -40,4 +41,23 @@ public class EntryViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _id, value);
     }
 
+    public Entry VmToModel()
+    {
+        Entry mapped = new Entry();
+        mapped.Id = this.Id;
+        mapped.PositionId = this.PositionId;
+        mapped.Item = this.Item;
+        mapped.Category = this.Category;
+        mapped.Price = decimal.Parse(this.Price);
+        return mapped;
+    }
+    
+    public void ModelToVm(Entry entry)
+    {
+        this.Id = entry.Id;
+        this.PositionId = entry.PositionId;
+        this.Item = entry.Item;
+        this.Category = entry.Category;
+        this.Price = entry.Price.ToString();
+    }
 }

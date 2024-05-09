@@ -9,6 +9,7 @@ namespace ReceiptOverview.Data;
 
 public class DataAccess
 {
+    private const int NO_FILTER = -1;
     private readonly string connectionString;
     private static readonly string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "data.db");
     private SqliteConnection connection;
@@ -142,7 +143,7 @@ public class DataAccess
 
 
     // CRUD Entries
-    public List<Entry> GetEntries()
+    private List<Entry> GetAllEntries(int positionId = -1)
     {
         List<Entry> resultSet = new();
         using (connection)
@@ -150,8 +151,10 @@ public class DataAccess
             if (connection.State != ConnectionState.Open)
                 connection.Open();
 
-            using (SqliteCommand selectCommand = new(SqlQueries.GetEntries(), connection))
+            using (SqliteCommand selectCommand = new(SqlQueries.GetEntriesForPosition(), connection))
             {
+                selectCommand.Parameters.Add(ParameterSelector.GetParameter(ColumnNames.POS_ID, positionId));
+                
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
                     return new List<Entry>();
@@ -172,10 +175,14 @@ public class DataAccess
             if (connection.State != ConnectionState.Closed)
                 connection.Close();
         }
-
         return resultSet;
     }
-
+    
+    public List<Entry> GetEntries(int positionId)
+    {
+        return GetAllEntries(positionId);
+    }
+    
     public int NewEntry(Entry newEntry)
     {
         int newEntryId = 0;
@@ -228,7 +235,7 @@ public class DataAccess
 
             using (SqliteCommand updateCommand = new(SqlQueries.UpdateEntry(), connection))
             {
-                // if an entry is assigned to a position, it should not be able, to change this assignment anymore
+                // if an entry is assigned to a position, it should not be possible, to change this assignment anymore
                 // so no parameter for PositionId
                 SqliteParameter paramId = ParameterSelector.GetParameter(ColumnNames.ID, entry.Id);
                 SqliteParameter paramItem = ParameterSelector.GetParameter(ColumnNames.ITEM, entry.Item);
@@ -266,15 +273,4 @@ public class DataAccess
                 connection.Close();
         }
     }
-
-
-    /*
-this.command.CommandText = "INSERT INTO StringData (field1, field2) VALUES(@param1, @param2)";
-this.command.CommandType = CommandType.Text;
-this.command.Parameters.Add(new SQLiteParameter("@param1", data.Data));
-this.command.Parameters.Add(new SQLiteParameter("@param2", data.ByteIndex));
-
-);
-
-*/
 }

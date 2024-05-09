@@ -1,9 +1,7 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using ReactiveUI;
-using ReceiptOverview.ViewModels;
 
-namespace ReceiptOverview.Models;
+namespace ReceiptOverview.ViewModels;
 
 public class DateViewModel : ViewModelBase
 {
@@ -55,11 +53,19 @@ public class DateViewModel : ViewModelBase
 
     public DateViewModel(int day, int month, int year)
     {
-        Day = day;
-        Month = month;
-        Year = year;
+        this.Day = day;
+        this.Month = month;
+        this.Year = year;
         SetDateString();
     }
 
+    public DateViewModel(DateTime date)
+    {
+        this.Day = date.Day;
+        this.Month = date.Month;
+        this.Year = date.Year;
+        SetDateString();
+    }
+    
     private void SetDateString() => Date = $"{Day}.{Month}.{Year}";
 }
