@@ -18,14 +18,12 @@ public static class SqlQueries
     {
         return $"SELECT * FROM {POSITION}";
     }
-
-    
     
     public static string NewPosition()
     {
         StringBuilder builder = new StringBuilder();
         builder.AppendLine($"INSERT INTO {POSITION} ({ColumnNames.DATE}, {ColumnNames.TOTAL}) ");
-        builder.AppendLine("VALUES @date, @total");
+        builder.AppendLine("VALUES (@date, @total)");
         return builder.ToString();
     }
 
@@ -38,8 +36,8 @@ public static class SqlQueries
     {
 	    StringBuilder builder = new StringBuilder();
 	    builder.AppendLine($"UPDATE {POSITION} ");
-	    builder.AppendLine($"SET {ColumnNames.DATE} = @date");
-	    builder.AppendLine($"SET {ColumnNames.TOTAL} = @total");
+	    builder.AppendLine($"SET {ColumnNames.DATE} = @date,");
+	    builder.AppendLine($"{ColumnNames.TOTAL} = @total");
 	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
     }
@@ -64,8 +62,8 @@ public static class SqlQueries
     public static string NewEntry()
     {
 	    StringBuilder builder = new StringBuilder();
-	    builder.AppendLine($"INSERT INTO {ENTRY} ({ColumnNames.ID}, {ColumnNames.POS_ID}, {ColumnNames.ITEM}, {ColumnNames.CATEGORY}, {ColumnNames.PRICE}) ");
-	    builder.AppendLine("VALUES @id, @positionId, @item, @category, @price");
+	    builder.AppendLine($"INSERT INTO {ENTRY} ({ColumnNames.POS_ID}, {ColumnNames.ITEM}, {ColumnNames.CATEGORY}, {ColumnNames.PRICE}) ");
+	    builder.AppendLine("VALUES (@positionId, @item, @category, @price)");
 	    return builder.ToString();
     }
 
@@ -73,9 +71,9 @@ public static class SqlQueries
     {
 	    StringBuilder builder = new StringBuilder();
 	    builder.AppendLine($"UPDATE {ENTRY} ");
-	    builder.AppendLine($"SET {ColumnNames.ITEM} = @title");
-	    builder.AppendLine($"SET {ColumnNames.CATEGORY} = @category");
-	    builder.AppendLine($"SET {ColumnNames.PRICE} = @price");
+	    builder.AppendLine($"SET {ColumnNames.ITEM} = @title,");
+	    builder.AppendLine($"{ColumnNames.CATEGORY} = @category,");
+	    builder.AppendLine($"{ColumnNames.PRICE} = @price");
 	    builder.AppendLine($"WHERE {ColumnNames.ID} = @id");
 	    return builder.ToString();
     }

@@ -111,14 +111,7 @@ public class DataAccess
         {
             if (connection.State != ConnectionState.Open)
                 connection.Open();
-
-            // TODO: extract this code to the CentralLogic
-            // first, delete all entries of a Position, and then the position
-            foreach (var entry in position.Entries)
-            {
-                this.DeleteEntry(entry);
-            }
-
+            
             using (SqliteCommand deleteCommand = new(SqlQueries.DeletePosition(), connection))
             {
                 SqliteParameter paramId = ParameterSelector.GetParameter(ColumnNames.ID, position.Id);
