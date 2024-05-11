@@ -9,21 +9,21 @@ public class ParameterSelector
     {
         switch (parameterName)
         {
-            case ColumnNames.ID:
+            case ConstStrings.ID:
                 return IdParameter(value);
             
-            case ColumnNames.DATE:
+            case ConstStrings.DATE:
                 return DateParameter(value);
-            case ColumnNames.TOTAL:
+            case ConstStrings.TOTAL:
                 return TotalParameter(value);
             
-            case ColumnNames.POS_ID:
+            case ConstStrings.POS_ID:
                 return PositionIdParameter(value);
-            case ColumnNames.ITEM:
+            case ConstStrings.ITEM:
                 return ItemParameter(value);
-            case ColumnNames.CATEGORY:
+            case ConstStrings.CATEGORY:
                 return CategoryParameter(value);
-            case ColumnNames.PRICE:
+            case ConstStrings.PRICE:
                 return PriceParameter(value);
             
             default:
@@ -37,8 +37,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.ID,
-            ParameterName = "@id",
+            SourceColumn = ConstStrings.ID,
+            ParameterName = ConstStrings.ID_PARAM,
             Value = value
         };
     }
@@ -49,8 +49,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Date,
-            SourceColumn = ColumnNames.DATE,
-            ParameterName = "@date",
+            SourceColumn = ConstStrings.DATE,
+            ParameterName = ConstStrings.DATE_PARAM,
             Value = value
         };
     }
@@ -60,8 +60,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.TOTAL,
-            ParameterName = "@total",
+            SourceColumn = ConstStrings.TOTAL,
+            ParameterName = ConstStrings.TOTAL_PARAM,
             Value = value
         };
     }
@@ -72,8 +72,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Date,
-            SourceColumn = ColumnNames.POS_ID,
-            ParameterName = "@positionId",
+            SourceColumn = ConstStrings.POS_ID,
+            ParameterName = ConstStrings.POS_ID_PARAM,
             Value = value
         };
     }
@@ -83,8 +83,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.ITEM,
-            ParameterName = "@item",
+            SourceColumn = ConstStrings.ITEM,
+            ParameterName = ConstStrings.ITEM_PARAM,
             Value = value
         };
     }
@@ -94,8 +94,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.CATEGORY,
-            ParameterName = "@category",
+            SourceColumn = ConstStrings.CATEGORY,
+            ParameterName = ConstStrings.CATEGORY_PARAM,
             Value = value
         };
     }
@@ -105,8 +105,8 @@ public class ParameterSelector
         return new()
         {
             DbType = DbType.Decimal,
-            SourceColumn = ColumnNames.PRICE,
-            ParameterName = "@price",
+            SourceColumn = ConstStrings.PRICE,
+            ParameterName = ConstStrings.PRICE_PARAM,
             Value = value
         };
     }

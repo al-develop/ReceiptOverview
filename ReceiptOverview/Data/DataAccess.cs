@@ -8,25 +8,23 @@ namespace ReceiptOverview.Data;
 
 public class DataAccess
 {
-    private readonly string connectionString;
-    private SqliteConnection connection;
+    private SqliteConnection _connection;
 
     public DataAccess(string dbPath)
     {
-        this.connectionString = $"Data Source={dbPath};";
-        connection = new SqliteConnection(connectionString);
+        _connection = new SqliteConnection($"Data Source={dbPath};");
     }
 
     // CRUD Positions
     public List<Position> GetPositions()
     {
         List<Position> resultSet = new();
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand selectCommand = new(SqlQueries.GetPositions(), connection))
+            using (SqliteCommand selectCommand = new(SqlQueries.GetPositions(), _connection))
             {
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
@@ -35,16 +33,16 @@ public class DataAccess
                 while (reader.Read())
                 {
                     Position current = new();
-                    current.Id = (Int32)reader[ColumnNames.ID];
-                    current.Date = DateTime.Parse(reader[ColumnNames.DATE].ToString()!);
-                    current.Total = (decimal)reader[ColumnNames.TOTAL];
+                    current.Id = (Int32)reader[ConstStrings.ID];
+                    current.Date = DateTime.Parse(reader[ConstStrings.DATE].ToString()!);
+                    current.Total = (decimal)reader[ConstStrings.TOTAL];
 
                     resultSet.Add(current);
                 }
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return resultSet;
@@ -53,15 +51,15 @@ public class DataAccess
     public int NewPosition(Position newPosition)
     {
         int newPositionId = 0;
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand insertCommand = new(SqlQueries.NewPosition(), connection))
+            using (SqliteCommand insertCommand = new(SqlQueries.NewPosition(), _connection))
             {
-                SqliteParameter paramDate = ParameterSelector.GetParameter(ColumnNames.DATE, newPosition.Date);
-                SqliteParameter paramTotal = ParameterSelector.GetParameter(ColumnNames.TOTAL, newPosition.Total);
+                SqliteParameter paramDate = ParameterSelector.GetParameter(ConstStrings.DATE, newPosition.Date);
+                SqliteParameter paramTotal = ParameterSelector.GetParameter(ConstStrings.TOTAL, newPosition.Total);
 
                 insertCommand.Parameters.Add(paramDate);
                 insertCommand.Parameters.Add(paramTotal);
@@ -71,8 +69,8 @@ public class DataAccess
 
             newPositionId = GetNextPositionId();
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return newPositionId;
@@ -80,16 +78,16 @@ public class DataAccess
 
     public int UpdatePosition(Position position)
     {
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand updateCommand = new(SqlQueries.UpdatePosition(), connection))
+            using (SqliteCommand updateCommand = new(SqlQueries.UpdatePosition(), _connection))
             {
-                SqliteParameter paramId = ParameterSelector.GetParameter(ColumnNames.ID, position.Id);
-                SqliteParameter paramDate = ParameterSelector.GetParameter(ColumnNames.DATE, position.Date);
-                SqliteParameter paramTotal = ParameterSelector.GetParameter(ColumnNames.TOTAL, position.Total);
+                SqliteParameter paramId = ParameterSelector.GetParameter(ConstStrings.ID, position.Id);
+                SqliteParameter paramDate = ParameterSelector.GetParameter(ConstStrings.DATE, position.Date);
+                SqliteParameter paramTotal = ParameterSelector.GetParameter(ConstStrings.TOTAL, position.Total);
 
                 updateCommand.Parameters.Add(paramId);
                 updateCommand.Parameters.Add(paramDate);
@@ -98,8 +96,8 @@ public class DataAccess
                 updateCommand.ExecuteNonQuery();
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return position.Id;
@@ -107,26 +105,20 @@ public class DataAccess
 
     public void DeletePosition(Position position)
     {
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            // first, delete all entries of a Position, and then the position
-            foreach (var entry in position.Entries)
+            using (SqliteCommand deleteCommand = new(SqlQueries.DeletePosition(), _connection))
             {
-                this.DeleteEntry(entry);
-            }
-
-            using (SqliteCommand deleteCommand = new(SqlQueries.DeletePosition(), connection))
-            {
-                SqliteParameter paramId = ParameterSelector.GetParameter(ColumnNames.ID, position.Id);
+                SqliteParameter paramId = ParameterSelector.GetParameter(ConstStrings.ID, position.Id);
                 deleteCommand.Parameters.Add(paramId);
                 deleteCommand.ExecuteNonQuery();
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
     }
 
@@ -135,14 +127,14 @@ public class DataAccess
     private List<Entry> GetAllEntries(int positionId = -1)
     {
         List<Entry> resultSet = new();
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand selectCommand = new(SqlQueries.GetEntriesForPosition(), connection))
+            using (SqliteCommand selectCommand = new(SqlQueries.GetEntriesForPosition(), _connection))
             {
-                selectCommand.Parameters.Add(ParameterSelector.GetParameter(ColumnNames.POS_ID, positionId));
+                selectCommand.Parameters.Add(ParameterSelector.GetParameter(ConstStrings.POS_ID, positionId));
 
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
@@ -151,18 +143,18 @@ public class DataAccess
                 while (reader.Read())
                 {
                     Entry current = new();
-                    current.Id = (Int32)reader[ColumnNames.ID];
-                    current.PositionId = (Int32)reader[ColumnNames.POS_ID];
-                    current.Item = reader[ColumnNames.ITEM].ToString()!;
-                    current.Category = reader[ColumnNames.CATEGORY].ToString()!;
-                    current.Price = (decimal)reader[ColumnNames.PRICE];
+                    current.Id = (Int32)reader[ConstStrings.ID];
+                    current.PositionId = (Int32)reader[ConstStrings.POS_ID];
+                    current.Item = reader[ConstStrings.ITEM].ToString()!;
+                    current.Category = reader[ConstStrings.CATEGORY].ToString()!;
+                    current.Price = (decimal)reader[ConstStrings.PRICE];
 
                     resultSet.Add(current);
                 }
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return resultSet;
@@ -176,17 +168,17 @@ public class DataAccess
     public int NewEntry(Entry newEntry)
     {
         int newEntryId = 0;
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand insertCommand = new(SqlQueries.NewEntry(), connection))
+            using (SqliteCommand insertCommand = new(SqlQueries.NewEntry(), _connection))
             {
-                SqliteParameter paramPositionId = ParameterSelector.GetParameter(ColumnNames.POS_ID, newEntry.PositionId);
-                SqliteParameter paramItem = ParameterSelector.GetParameter(ColumnNames.ITEM, newEntry.Item);
-                SqliteParameter paramCategory = ParameterSelector.GetParameter(ColumnNames.CATEGORY, newEntry.Category);
-                SqliteParameter paramPrice = ParameterSelector.GetParameter(ColumnNames.PRICE, newEntry.Price);
+                SqliteParameter paramPositionId = ParameterSelector.GetParameter(ConstStrings.POS_ID, newEntry.PositionId);
+                SqliteParameter paramItem = ParameterSelector.GetParameter(ConstStrings.ITEM, newEntry.Item);
+                SqliteParameter paramCategory = ParameterSelector.GetParameter(ConstStrings.CATEGORY, newEntry.Category);
+                SqliteParameter paramPrice = ParameterSelector.GetParameter(ConstStrings.PRICE, newEntry.Price);
 
                 insertCommand.Parameters.Add(paramPositionId);
                 insertCommand.Parameters.Add(paramItem);
@@ -198,8 +190,8 @@ public class DataAccess
 
             newEntryId = GetNextEntryId();
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return newEntryId;
@@ -207,19 +199,19 @@ public class DataAccess
 
     public int UpdateEntry(Entry entry)
     {
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand updateCommand = new(SqlQueries.UpdateEntry(), connection))
+            using (SqliteCommand updateCommand = new(SqlQueries.UpdateEntry(), _connection))
             {
                 // if an entry is assigned to a position, it should not be possible, to change this assignment anymore
                 // so no parameter for PositionId
-                SqliteParameter paramId = ParameterSelector.GetParameter(ColumnNames.ID, entry.Id);
-                SqliteParameter paramItem = ParameterSelector.GetParameter(ColumnNames.ITEM, entry.Item);
-                SqliteParameter paramCategory = ParameterSelector.GetParameter(ColumnNames.CATEGORY, entry.Category);
-                SqliteParameter paramPrice = ParameterSelector.GetParameter(ColumnNames.PRICE, entry.Price);
+                SqliteParameter paramId = ParameterSelector.GetParameter(ConstStrings.ID, entry.Id);
+                SqliteParameter paramItem = ParameterSelector.GetParameter(ConstStrings.ITEM, entry.Item);
+                SqliteParameter paramCategory = ParameterSelector.GetParameter(ConstStrings.CATEGORY, entry.Category);
+                SqliteParameter paramPrice = ParameterSelector.GetParameter(ConstStrings.PRICE, entry.Price);
 
                 updateCommand.Parameters.Add(paramId);
                 updateCommand.Parameters.Add(paramItem);
@@ -229,8 +221,8 @@ public class DataAccess
                 updateCommand.ExecuteNonQuery();
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return entry.Id;
@@ -238,20 +230,20 @@ public class DataAccess
 
     public void DeleteEntry(Entry entry)
     {
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
 
-            using (SqliteCommand deleteCommand = new(SqlQueries.DeleteEntry(), connection))
+            using (SqliteCommand deleteCommand = new(SqlQueries.DeleteEntry(), _connection))
             {
-                SqliteParameter paramId = ParameterSelector.GetParameter(ColumnNames.ID, entry.Id);
+                SqliteParameter paramId = ParameterSelector.GetParameter(ConstStrings.ID, entry.Id);
                 deleteCommand.Parameters.Add(paramId);
                 deleteCommand.ExecuteNonQuery();
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
     }
 
@@ -262,15 +254,15 @@ public class DataAccess
         bool success;
         try
         {
-            using (connection)
+            using (_connection)
             {
-                if (connection.State != ConnectionState.Open)
-                    connection.Open();
+                if (_connection.State != ConnectionState.Open)
+                    _connection.Open();
 
                 // Attempt to read the ID of the first position.
                 // if the database has no tables, an exception occurs
                 // if the table exists, but has no entries, 0 will be returned
-                using (SqliteCommand selectCommand = new(SqlQueries.GetFirstPositionId(), connection))
+                using (SqliteCommand selectCommand = new(SqlQueries.GetFirstPositionId(), _connection))
                 {
                     SqliteDataReader reader = selectCommand.ExecuteReader();
                     reader.Read();
@@ -285,8 +277,8 @@ public class DataAccess
         }
         finally
         {
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return success;
@@ -295,11 +287,11 @@ public class DataAccess
     private int GetNextPositionId()
     {
         int nextPostitionId = 0;
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
-            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestPositionId(), connection))
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
+            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestPositionId(), _connection))
             {
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
@@ -307,12 +299,12 @@ public class DataAccess
 
                 while (reader.Read())
                 {
-                    nextPostitionId = (Int32)reader[ColumnNames.ID];
+                    nextPostitionId = (Int32)reader[ConstStrings.ID];
                 }
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return nextPostitionId++;
@@ -321,12 +313,12 @@ public class DataAccess
     private int GetNextEntryId()
     {
         int nextEntryId = 0;
-        using (connection)
+        using (_connection)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (_connection.State != ConnectionState.Open)
+                _connection.Open();
             
-            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestEntryId(), connection))
+            using (SqliteCommand selectCommand = new(SqlQueries.GetLatestEntryId(), _connection))
             {
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
@@ -334,12 +326,12 @@ public class DataAccess
 
                 while (reader.Read())
                 {
-                    nextEntryId = (Int32)reader[ColumnNames.ID];
+                    nextEntryId = (Int32)reader[ConstStrings.ID];
                 }
             }
 
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (_connection.State != ConnectionState.Closed)
+                _connection.Close();
         }
 
         return nextEntryId++;

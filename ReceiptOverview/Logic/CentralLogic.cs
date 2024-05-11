@@ -39,7 +39,11 @@ public class CentralLogic
 
     public void DeletePosition(Position position)
     {
-        // on deletion of a position, the data layer handles the deletion of entries associated to a Position
+        // on deletion of a position, first delete all Entries of the Position
+        foreach (var entry in position.Entries)
+        {
+            this.DeleteEntry(entry);
+        }
         Access.DeletePosition(position);
     }
 
