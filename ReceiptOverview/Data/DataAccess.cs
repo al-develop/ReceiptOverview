@@ -29,16 +29,17 @@ public class DataAccess
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
                     return new List<Position>();
-
+                
                 while (reader.Read())
                 {
                     Position current = new();
-                    current.Id = (Int32)reader[ConstStrings.ID];
+                    current.Id = Convert.ToInt32(reader[ConstStrings.ID]);
                     current.Date = DateTime.Parse(reader[ConstStrings.DATE].ToString()!);
-                    current.Total = (decimal)reader[ConstStrings.TOTAL];
+                    current.Total = Convert.ToDecimal(reader[ConstStrings.TOTAL]);
 
                     resultSet.Add(current);
                 }
+                reader.Close();
             }
 
             if (_connection.State != ConnectionState.Closed)
@@ -67,7 +68,7 @@ public class DataAccess
                 insertCommand.ExecuteNonQuery();
             }
 
-            newPositionId = GetNextPositionId();
+            newPositionId = GetLatestPositionId();
 
             if (_connection.State != ConnectionState.Closed)
                 _connection.Close();
@@ -143,14 +144,15 @@ public class DataAccess
                 while (reader.Read())
                 {
                     Entry current = new();
-                    current.Id = (Int32)reader[ConstStrings.ID];
-                    current.PositionId = (Int32)reader[ConstStrings.POS_ID];
+                    current.Id = Convert.ToInt32(reader[ConstStrings.ID]);
+                    current.PositionId = Convert.ToInt32(reader[ConstStrings.POS_ID]);
                     current.Item = reader[ConstStrings.ITEM].ToString()!;
                     current.Category = reader[ConstStrings.CATEGORY].ToString()!;
-                    current.Price = (decimal)reader[ConstStrings.PRICE];
+                    current.Price = Convert.ToDecimal(reader[ConstStrings.PRICE]);
 
                     resultSet.Add(current);
                 }
+                reader.Close();
             }
 
             if (_connection.State != ConnectionState.Closed)
@@ -188,7 +190,7 @@ public class DataAccess
                 insertCommand.ExecuteNonQuery();
             }
 
-            newEntryId = GetNextEntryId();
+            newEntryId = GetLatestEntryId();
 
             if (_connection.State != ConnectionState.Closed)
                 _connection.Close();
@@ -266,13 +268,15 @@ public class DataAccess
                 {
                     SqliteDataReader reader = selectCommand.ExecuteReader();
                     reader.Read();
+                    reader.Close();
                 }
-
+                
                 success = true;
             }
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"In DataAccess: {ex.Message}");
             success = false;
         }
         finally
@@ -284,9 +288,9 @@ public class DataAccess
         return success;
     }
 
-    private int GetNextPositionId()
+    private int GetLatestPositionId()
     {
-        int nextPostitionId = 0;
+        int latestPostitionId = 0;
         using (_connection)
         {
             if (_connection.State != ConnectionState.Open)
@@ -295,24 +299,25 @@ public class DataAccess
             {
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
-                    return nextPostitionId;
+                    return latestPostitionId;
 
                 while (reader.Read())
                 {
-                    nextPostitionId = (Int32)reader[ConstStrings.ID];
+                    latestPostitionId = Convert.ToInt32(reader[ConstStrings.ID]);
                 }
+                reader.Close();
             }
 
             if (_connection.State != ConnectionState.Closed)
                 _connection.Close();
         }
 
-        return nextPostitionId++;
+        return latestPostitionId;
     }
 
-    private int GetNextEntryId()
+    private int GetLatestEntryId()
     {
-        int nextEntryId = 0;
+        int latestEntryId = 0;
         using (_connection)
         {
             if (_connection.State != ConnectionState.Open)
@@ -322,18 +327,19 @@ public class DataAccess
             {
                 SqliteDataReader reader = selectCommand.ExecuteReader();
                 if (!reader.HasRows)
-                    return nextEntryId;
+                    return latestEntryId;
 
                 while (reader.Read())
                 {
-                    nextEntryId = (Int32)reader[ConstStrings.ID];
+                    latestEntryId = Convert.ToInt32(reader[ConstStrings.ID]);
                 }
+                reader.Close();
             }
 
             if (_connection.State != ConnectionState.Closed)
                 _connection.Close();
         }
 
-        return nextEntryId++;
+        return latestEntryId;
     }
 }

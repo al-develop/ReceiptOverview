@@ -51,6 +51,6 @@ public class SimpleMessageBoxViewModel : ViewModelBase
         this.Message = message;
 
         ConfirmCommand = ReactiveCommand.Create(() => { Result = true; return Result; });
-        CancelCommand = ReactiveCommand.Create(() => { Result = true; return Result; });
+        CancelCommand = ReactiveCommand.Create(() => { Result = false; return Result; });
     }
 }

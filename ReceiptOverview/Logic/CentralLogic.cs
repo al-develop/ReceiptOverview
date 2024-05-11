@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using ReceiptOverview.Data;
 using ReceiptOverview.Models;
+using ReceiptOverview.ViewModels;
 
 namespace ReceiptOverview.Logic;
 
 public class CentralLogic
 {
     private DataAccess Access { get; }
-    private readonly string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "data.db");
+    private readonly string _dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "data.db");
 
     public CentralLogic()
     {
-        Access = new DataAccess(dbPath);
+        Access = new DataAccess(_dbPath);
     }
 
     public List<Position> GetPositions()
@@ -23,8 +24,9 @@ public class CentralLogic
         {
             positions = Access.GetPositions();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine($"In CentralLogic {ex.Message}");
             positions = new();
         }
 
@@ -73,7 +75,6 @@ public class CentralLogic
 
     public bool CheckDbConnection()
     {
-        return File.Exists(dbPath) && Access.CheckDbConnection();
+        return File.Exists(_dbPath) && Access.CheckDbConnection();
     }
-
 }

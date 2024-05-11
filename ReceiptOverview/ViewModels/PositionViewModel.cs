@@ -61,6 +61,7 @@ public class PositionViewModel : ViewModelBase
         mapped.Date = new DateTime(Date.Year, Date.Month, Date.Day);
         mapped.Total = decimal.Parse(this.Total);
         mapped.Entries = new List<Entry>();
+        
         foreach (var entryViewModel in this.Entries)
         {
             Entry entry = entryViewModel.VmToModel();
