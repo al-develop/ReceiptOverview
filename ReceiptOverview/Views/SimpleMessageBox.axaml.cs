@@ -16,6 +16,11 @@ namespace ReceiptOverview.Views
             
             this.WhenActivated(action => action(ViewModel!.ConfirmCommand.Subscribe(Close)));
             this.WhenActivated(action => action(ViewModel!.CancelCommand.Subscribe(Close)));
+
+            if(BtnCancel.IsVisible)
+                BtnCancel.Focus();
+            else
+                BtnConfirm.Focus();
         }
 
         private void Close(bool messageBoxResult)

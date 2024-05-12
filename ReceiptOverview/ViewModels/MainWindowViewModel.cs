@@ -24,7 +24,9 @@ namespace ReceiptOverview.ViewModels
         private bool _mainUiActive;
         private bool _canDeletePosition;
         private bool _canDeleteEntry;
-
+        private bool _checkVisible;
+        private bool _crossVisible;
+        
         public ObservableCollection<PositionViewModel> Positions
         {
             get => _positions;
@@ -69,10 +71,6 @@ namespace ReceiptOverview.ViewModels
             get => _mainUiActive;
             set => this.RaiseAndSetIfChanged(ref _mainUiActive, value);
         }
-        private bool _checkVisible;
-        private bool _crossVisible;
-        
-
         public bool CrossVisible
         {
             get => _crossVisible;
@@ -83,6 +81,9 @@ namespace ReceiptOverview.ViewModels
             get => _checkVisible;
             set => this.RaiseAndSetIfChanged(ref _checkVisible, value);
         }
+
+
+        public ICommand CopyEntryCommand { get; set; }
         public ICommand NewPositionCommand { get; }
         public ICommand RemovePositionCommand { get; }
         public ICommand NewEntryCommand { get; }
@@ -111,7 +112,8 @@ namespace ReceiptOverview.ViewModels
 
             RemovePositionCommand = ReactiveCommand.CreateFromTask(async () => await RemovePosition());
             RemoveEntryCommand = ReactiveCommand.CreateFromTask(async () => await RemoveEntry());
-
+            
+            CopyEntryCommand = ReactiveCommand.Create(() => CopyEntry());
             NewPositionCommand = ReactiveCommand.Create(() => CreateNewPosition());
             NewEntryCommand = ReactiveCommand.Create(() => SaveEntry());
             SaveCommand = ReactiveCommand.Create(() => Save());
@@ -121,6 +123,8 @@ namespace ReceiptOverview.ViewModels
             LoadPositionsWithEntries();
         }
 
+        
+        
         private void LoadPositionsWithEntries()
         {
             List<Position> positions = Logic.GetPositions();
@@ -219,7 +223,7 @@ namespace ReceiptOverview.ViewModels
         {
             if (CurrentPosition == null! || CurrentPosition.Id == 0)
                 return;
-
+           
             MainUiActive = false;
 
             bool confirm = await ShowDeleteDialog("Delete Position",
@@ -243,7 +247,7 @@ namespace ReceiptOverview.ViewModels
         {
             if (CurrentEntry == null! || CurrentEntry.Id == 0)
                 return;
-
+            
             MainUiActive = false;
 
             SimpleMessageBoxViewModel dialog = new("Delete Entry", $"Are you sure, you want to delete the entry {CurrentEntry.Id}?");
@@ -256,10 +260,11 @@ namespace ReceiptOverview.ViewModels
                 return;
             }
 
-            // Code to remove an entry from the db, and then from the collection
+            // Code to remove an entry from the db, and then from the collection. Update total price afterwards.
             Logic.DeleteEntry(CurrentEntry.VmToModel());
             CurrentPosition.Entries.Remove(CurrentEntry);
-
+            CurrentPosition.Total = CurrentPosition.Entries.Sum(s => Convert.ToDecimal(s.Price)).ToString();
+            
             MainUiActive = true;
         }
 
@@ -299,6 +304,28 @@ namespace ReceiptOverview.ViewModels
             await ShowDialog.Handle(dialog);
         }
 
+        private void CopyEntry()
+        {
+            if (CurrentEntry == null || CurrentEntry.Id == 0)
+                return;
+
+            EntryViewModel newEntry = new();
+            
+            newEntry.Category = CurrentEntry.Category;
+            newEntry.Item = CurrentEntry.Item;
+            newEntry.Price = CurrentEntry.Price;
+            newEntry.PositionId = CurrentEntry.PositionId;
+            int entryId = Logic.SaveEntry(newEntry.VmToModel());
+            newEntry.Id = entryId;
+            
+            CurrentPosition.Entries.Add(newEntry);
+            CurrentPosition.Total = CurrentPosition.Entries.Sum(s => Convert.ToDecimal(s.Price)).ToString();
+
+            CrossVisible = true;
+            CheckVisible = false;
+        }
+        
+        
         private string GetConnectionErrorMessage()
         {
             StringBuilder errorMessage = new();

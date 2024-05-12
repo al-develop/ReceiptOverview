@@ -44,7 +44,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
         }
     }
-
+    
     private void TbxItemName_OnGotFocus(object? sender, GotFocusEventArgs e)
     {
         TbxItemName.SelectAll();
@@ -58,5 +58,25 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     private void TbxPrice_OnGotFocus(object? sender, GotFocusEventArgs e)
     {
         TbxPrice.SelectAll();
+    }
+
+    private void TbxDay_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TbxDay.SelectAll();
+    }
+
+    private void TbxYear_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TbxMonth.SelectAll();
+    }
+
+    private void TbxMonth_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TbxYear.SelectAll();
+    }
+
+    private void BtnNewPos_OnClick(object? sender, RoutedEventArgs e)
+    {
+        TbxDay.Focus();
     }
 }

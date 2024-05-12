@@ -23,7 +23,7 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel />
     </Design.DataContext>
-
+    
     <Window.Styles>
         <Styles>
             <Style Selector="TextBox">
@@ -118,7 +118,7 @@
                 <Button Margin="5,0,0,0"
                         IsTabStop="False"
                         Command="{Binding NewPositionCommand}"
-                        Name="BtnNewPos"
+                        Name="BtnNewPos" Click="BtnNewPos_OnClick"
                         HotKey="Ctrl+N">
                     <Button.Template>
                         <ControlTemplate>
@@ -139,7 +139,7 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-                <Button HorizontalAlignment="Center"
+                <Button HorizontalAlignment="Center" IsTabStop="False" HotKey="Delete"
                         IsEnabled="{Binding CanDeletePosition, Mode=TwoWay}"
                         Command="{Binding RemovePositionCommand}">
                     <Button.Template>
@@ -183,7 +183,8 @@
         </DockPanel>
 
         <!-- Entries ; Right Side -->
-        <DockPanel DockPanel.Dock="Right" LastChildFill="True"
+        <DockPanel DockPanel.Dock="Right"
+                   LastChildFill="True"
                    Grid.Row="1"
                    Grid.Column="1"
                    Margin="10,10,10,10">
@@ -224,27 +225,26 @@
                 <StackPanel Orientation="Vertical"
                             Margin="0,0,5,0">
                     <TextBlock Text="Day" />
-                    <NumericUpDown Watermark="Day"
-                                   Minimum="1"
-                                   Maximum="31"
-                                   Value="{Binding CurrentPosition.Date.Day, Mode=TwoWay}" />
+                    <TextBox Watermark="Day"
+                             Name="TbxDay" TabIndex="0"
+                             GotFocus="TbxDay_OnGotFocus"
+                             Text="{Binding CurrentPosition.Date.Day, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical"
                             Margin="10,0,5,0">
                     <TextBlock Text="Month" />
-                    <NumericUpDown Watermark="Month"
-                                   Minimum="1"
-                                   Maximum="12"
-                                   Value="{Binding CurrentPosition.Date.Month, Mode=TwoWay}" />
+                    <TextBox Watermark="Month" TabIndex="1"
+                             Name="TbxMonth"
+                             GotFocus="TbxMonth_OnGotFocus"
+                             Text="{Binding CurrentPosition.Date.Month, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical"
                             Margin="10,0,5,0">
                     <TextBlock Text="Year" />
-                    <NumericUpDown Watermark="Year"
-                                   Minimum="2000"
-                                   Maximum="2100"
-                                   FormatString="{}{0}"
-                                   Value="{Binding CurrentPosition.Date.Year, Mode=TwoWay}" />
+                    <TextBox Watermark="Year" TabIndex="2"
+                             Name="TbxYear"
+                             GotFocus="TbxYear_OnGotFocus"
+                             Text="{Binding CurrentPosition.Date.Year, Mode=TwoWay}" />
                 </StackPanel>
             </StackPanel>
 
@@ -260,22 +260,27 @@
                          GotFocus="TbxItemName_OnGotFocus"
                          HorizontalAlignment="Stretch"
                          Text="{Binding CurrentEntry.Item, Mode=TwoWay}"
-                         TabIndex="0" />
+                         TabIndex="3" />
 
                 <TextBlock Text="Category"
                            Margin="0,10,0,0" />
-                <TextBox Watermark="Category" Name="TbxCategory" GotFocus="TbxCategory_OnGotFocus"
+                <TextBox Watermark="Category"
+                         Name="TbxCategory"
+                         GotFocus="TbxCategory_OnGotFocus"
                          Text="{Binding CurrentEntry.Category, Mode=TwoWay}"
-                         TabIndex="1" />
+                         TabIndex="4" />
 
                 <TextBlock Text="Price"
                            Margin="0,10,0,0" />
-                <TextBox Watermark="Price" Name="TbxPrice" GotFocus="TbxPrice_OnGotFocus"
+                <TextBox Watermark="Price"
+                         Name="TbxPrice"
+                         GotFocus="TbxPrice_OnGotFocus"
                          Text="{Binding CurrentEntry.Price, Mode=TwoWay}"
-                         TabIndex="2" />
+                         TabIndex="5" />
             </StackPanel>
 
-            <DockPanel HorizontalAlignment="Right" DockPanel.Dock="Top"
+            <DockPanel HorizontalAlignment="Right"
+                       DockPanel.Dock="Top"
                        Name="DockEntryButtons"
                        Margin="0,5,0,25">
                 <StackPanel Orientation="Horizontal">
@@ -308,6 +313,7 @@
 
                     <Button Command="{Binding RemoveEntryCommand}"
                             IsEnabled="{Binding CanDeletePosition}"
+                            IsTabStop="False" HotKey="-"
                             Background="#684fa3">
                         <Button.Template>
                             <ControlTemplate>
@@ -333,7 +339,9 @@
                 </StackPanel>
             </DockPanel>
 
-            <DockPanel HorizontalAlignment="Right" DockPanel.Dock="Bottom"
+            <Button Name="BtnCopyEntry" Command="{Binding CopyEntryCommand}" HotKey="+" Width="0" Height="0"/>
+            <DockPanel HorizontalAlignment="Right"
+                       DockPanel.Dock="Bottom"
                        Name="PanelSavePositionButton"
                        Width="150">
                 <Button Margin="5,10,10,0"
@@ -360,12 +368,21 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-                <Image Width="18" Height="18" DockPanel.Dock="Right" Source="avares://ReceiptOverview/Assets/check.png" IsVisible="{Binding CheckVisible}" />
-                <Image Width="18" Height="18" DockPanel.Dock="Right" Source="avares://ReceiptOverview/Assets/cross.png" IsVisible="{Binding CrossVisible}" />
+                <Image Width="24"
+                       Height="24" 
+                       DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,10,0,0"
+                       Source="avares://ReceiptOverview/Assets/check.png"
+                       IsVisible="{Binding CheckVisible}" />
+                <Image Width="24"
+                       Height="24" VerticalAlignment="Center" Margin="0,10,0,0"
+                       DockPanel.Dock="Right"
+                       Source="avares://ReceiptOverview/Assets/cross.png"
+                       IsVisible="{Binding CrossVisible}" />
             </DockPanel>
-            
-            <DataGrid IsReadOnly="True" DockPanel.Dock="Top"
-                      Name="GridEntries"
+
+            <DataGrid IsReadOnly="True"
+                      DockPanel.Dock="Top"
+                      Name="GridEntries" 
                       ItemsSource="{Binding CurrentPosition.Entries, Mode=TwoWay}"
                       SelectedItem="{Binding CurrentEntry, Mode=TwoWay}"
                       IsTabStop="False">
@@ -380,7 +397,7 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            
+
         </DockPanel>
     </Grid>
 </Window>
