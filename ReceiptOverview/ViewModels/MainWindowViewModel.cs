@@ -15,7 +15,7 @@ namespace ReceiptOverview.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        // private EventAggregator _eventAggregator;
+        private CsvExport CsvExport { get; set; }
         private CentralLogic Logic { get; }
 
         private PositionViewModel _currentPosition;
@@ -96,7 +96,6 @@ namespace ReceiptOverview.ViewModels
         public MainWindowViewModel()
         {
             Logic = new CentralLogic();
-            // _eventAggregator = new EventAggregator();
             
             MainUiActive = true;
             CanDeleteEntry = false;
@@ -116,7 +115,7 @@ namespace ReceiptOverview.ViewModels
             NewPositionCommand = ReactiveCommand.Create(() => CreateNewPosition());
             NewEntryCommand = ReactiveCommand.Create(() => SaveEntry());
             SaveCommand = ReactiveCommand.Create(() => Save());
-            ExportToCsvCommand = ReactiveCommand.Create(() => ExportToCsv());
+            ExportToCsvCommand = ReactiveCommand.Create(async() => await ExportToCsv());
             CheckDbConnectionCommand = ReactiveCommand.Create(async () => await CheckDbConnection());
 
             LoadPositionsWithEntries();
@@ -279,8 +278,15 @@ namespace ReceiptOverview.ViewModels
             CrossVisible = false;
         }
 
-        private void ExportToCsv()
+        private async Task ExportToCsv()
         {
+            CsvExport = new CsvExport();
+            CsvExport.ExportToCsV(Logic);
+            var title = "CSV Export";
+            var message = "Export done";
+
+            SimpleMessageBoxViewModel dialog = new(title, message, false);
+            await ShowDialog.Handle(dialog);
         }
 
         private async Task CheckDbConnection()
