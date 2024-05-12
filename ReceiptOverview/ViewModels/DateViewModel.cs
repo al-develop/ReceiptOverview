@@ -23,8 +23,8 @@ public class DateViewModel : ViewModelBase
         get => _year;
         set
         {
-            SetDateString();
             this.RaiseAndSetIfChanged(ref _year, value);
+            SetDateString();
         }
     }
 
@@ -34,8 +34,8 @@ public class DateViewModel : ViewModelBase
         get => _month;
         set
         {
-            SetDateString();
             this.RaiseAndSetIfChanged(ref _month, value);
+            SetDateString();
         }
     }
 
@@ -45,8 +45,8 @@ public class DateViewModel : ViewModelBase
         get => _day;
         set
         {
-            SetDateString();
             this.RaiseAndSetIfChanged(ref _day, value);
+            SetDateString();
         }
     }
 

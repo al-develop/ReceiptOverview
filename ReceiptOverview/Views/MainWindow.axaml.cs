@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
@@ -27,5 +28,20 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     private void BtnSaveEntry_OnClick(object? sender, RoutedEventArgs e)
     {
         TbxItemName.Focus();
+    }
+
+    // avalonia ui HotKey Gestures only execute command-bound code, but not the code behind code
+    // to implement the behaviour "save entry and set focus on TbxItemItem", the KeyDown on the window is used
+    private void Window_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            if (BtnSaveEntry.Command != null && BtnSaveEntry.Command.CanExecute(null))
+            {
+                BtnSaveEntry.Command.Execute(null);
+                TbxItemName.Focus();
+                e.Handled = true;
+            }
+        }
     }
 }

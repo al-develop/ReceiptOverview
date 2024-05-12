@@ -15,7 +15,8 @@
         x:Class="ReceiptOverview.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="avares://ReceiptOverview/Assets/avalonia-logo.ico"
-        Title="Receipt Overview">
+        Title="Receipt Overview"
+        KeyDown="Window_KeyDown">
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -46,7 +47,7 @@
             </Style>
         </Styles>
     </Window.Styles>
-   
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -56,7 +57,7 @@
             <ColumnDefinition Width="350" />
             <ColumnDefinition Width="450*" />
         </Grid.ColumnDefinitions>
-        
+
         <Menu Grid.Row="0"
               Grid.Column="0"
               Grid.ColumnSpan="2"
@@ -163,6 +164,7 @@
             </StackPanel>
 
             <DataGrid Margin="10"
+                      Name="GridPositions"
                       ItemsSource="{Binding Positions, Mode=TwoWay}"
                       SelectedItem="{Binding CurrentPosition, Mode=TwoWay}"
                       VerticalAlignment="Stretch"
@@ -184,182 +186,113 @@
                    Grid.Row="1"
                    Grid.Column="1"
                    Margin="10,10,10,10">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Stretch">
-                    <TextBlock Text="Position ID:    "
-                               FontSize="18"
-                               VerticalAlignment="Center"
-                               FontStyle="Italic"
-                               Foreground="Gray" />
-                    <TextBlock VerticalAlignment="Center"
-                               FontSize="18"
-                               Text="{Binding CurrentPosition.Id, Mode=TwoWay}"
-                               FontStyle="Italic"
-                               Foreground="Gray" />
-                    <Separator Width="1"
-                               Height="18" />
-                    <TextBlock Text="Total:     "
-                               FontSize="18"
-                               VerticalAlignment="Center"
-                               FontStyle="Italic"
-                               Foreground="Gray" />
-                    <TextBlock VerticalAlignment="Center"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               FontStyle="Italic"
-                               Text="{Binding CurrentPosition.Total, Mode=TwoWay}"
-                               Foreground="Gray" />
+            <StackPanel Orientation="Horizontal"
+                        Name="PanelPositionInfo"
+                        DockPanel.Dock="Top"
+                        HorizontalAlignment="Stretch">
+                <TextBlock Text="Position ID:    "
+                           FontSize="18"
+                           VerticalAlignment="Center"
+                           FontStyle="Italic"
+                           Foreground="Gray" />
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="18"
+                           Text="{Binding CurrentPosition.Id, Mode=TwoWay}"
+                           FontStyle="Italic"
+                           Foreground="Gray" />
+                <Separator Width="1"
+                           Height="18" />
+                <TextBlock Text="Total:     "
+                           FontSize="18"
+                           VerticalAlignment="Center"
+                           FontStyle="Italic"
+                           Foreground="Gray" />
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           FontStyle="Italic"
+                           Text="{Binding CurrentPosition.Total, Mode=TwoWay}"
+                           Foreground="Gray" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        Name="PanelPositionDate"
+                        DockPanel.Dock="Top"
+                        HorizontalAlignment="Stretch"
+                        Margin="0,10,0,0">
+                <StackPanel Orientation="Vertical"
+                            Margin="0,0,5,0">
+                    <TextBlock Text="Day" />
+                    <NumericUpDown Watermark="Day"
+                                   Minimum="1"
+                                   Maximum="31"
+                                   Value="{Binding CurrentPosition.Date.Day, Mode=TwoWay}" />
                 </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"
-                            Margin="0,10,0,0">
-                    <StackPanel Orientation="Vertical"
-                                Margin="0,0,5,0">
-                        <TextBlock Text="Day" />
-                        <NumericUpDown Watermark="Day"
-                                       Minimum="1"
-                                       Maximum="31" 
-                                       Value="{Binding CurrentPosition.Date.Day}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical"
-                                Margin="10,0,5,0">
-                        <TextBlock Text="Month" />
-                        <NumericUpDown Watermark="Month"
-                                       Minimum="1"
-                                       Maximum="12"
-                                       Value="{Binding CurrentPosition.Date.Month}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical"
-                                Margin="10,0,5,0">
-                        <TextBlock Text="Year" />
-                        <NumericUpDown Watermark="Year"
-                                       Minimum="2000"
-                                       Maximum="2100"
-                                       FormatString="{}{0}"
-                                       Value="{Binding CurrentPosition.Date.Year}" />
-                    </StackPanel>
+                <StackPanel Orientation="Vertical"
+                            Margin="10,0,5,0">
+                    <TextBlock Text="Month" />
+                    <NumericUpDown Watermark="Month"
+                                   Minimum="1"
+                                   Maximum="12"
+                                   Value="{Binding CurrentPosition.Date.Month, Mode=TwoWay}" />
                 </StackPanel>
+                <StackPanel Orientation="Vertical"
+                            Margin="10,0,5,0">
+                    <TextBlock Text="Year" />
+                    <NumericUpDown Watermark="Year"
+                                   Minimum="2000"
+                                   Maximum="2100"
+                                   FormatString="{}{0}"
+                                   Value="{Binding CurrentPosition.Date.Year, Mode=TwoWay}" />
+                </StackPanel>
+            </StackPanel>
 
-                <Separator Margin="0,5,0,25" />
+            <Separator Margin="0,5,0,25"
+                       DockPanel.Dock="Top" />
 
-                <DockPanel>
-                    <!-- <StackPanel Orientation="Vertical"> -->
-                    <!--     <TextBlock Text="Entry ID" /> -->
-                    <!--     <TextBox Watermark="ID" -->
-                    <!--              HorizontalAlignment="Left" -->
-                    <!--              Text="{Binding CurrentEntry.Id, Mode=TwoWay}" -->
-                    <!--              TabIndex="0" /> -->
-                    <!-- </StackPanel> -->
-                    <StackPanel Orientation="Vertical"
-                                Margin="0,0,0,0">
-                        <TextBlock Text="Item Name" />
-                        <TextBox Watermark="Item" Name="TbxItemName"
-                                 HorizontalAlignment="Stretch"
-                                 Text="{Binding CurrentEntry.Item, Mode=TwoWay}"
-                                 TabIndex="0" />
-                    </StackPanel>
-                </DockPanel>
-                
-                <TextBlock Text="Category" Margin="0,10,0,0"/>
-                <TextBox Watermark="Category" 
+            <StackPanel Name="PanelEntryData"
+                        DockPanel.Dock="Top"
+                        Orientation="Vertical">
+                <TextBlock Text="Item Name" />
+                <TextBox Watermark="Item"
+                         Name="TbxItemName"
+                         HorizontalAlignment="Stretch"
+                         Text="{Binding CurrentEntry.Item, Mode=TwoWay}"
+                         TabIndex="0" />
+
+                <TextBlock Text="Category"
+                           Margin="0,10,0,0" />
+                <TextBox Watermark="Category"
                          Text="{Binding CurrentEntry.Category, Mode=TwoWay}"
                          TabIndex="1" />
-                
-                <TextBlock Text="Price" Margin="0,10,0,0"/>
+
+                <TextBlock Text="Price"
+                           Margin="0,10,0,0" />
                 <TextBox Watermark="Price"
                          Text="{Binding CurrentEntry.Price, Mode=TwoWay}"
                          TabIndex="2" />
+            </StackPanel>
 
-                <DockPanel HorizontalAlignment="Right"
-                           Margin="0,5,0,25">
-                    <StackPanel Orientation="Horizontal">
-                        <Button Margin="5,0,10,0"
-                                HorizontalAlignment="Stretch"
-                                Command="{Binding NewEntryCommand}"
-                                IsTabStop="False"
-                                Name="BtnSaveEntry" Click="BtnSaveEntry_OnClick"
-                                HotKey="Enter">
-                            <Button.Template>
-                                <ControlTemplate>
-                                    <Border Background="{TemplateBinding Background}"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Stretch"
-                                            BorderThickness="8"
-                                            CornerRadius="3">
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Center">
-                                            <TextBlock Text="Save Entry"
-                                                       VerticalAlignment="Center"
-                                                       Margin="5,0,5,0" />
-                                            <Image Source="avares://ReceiptOverview/Assets/add.png"
-                                                   Width="18"
-                                                   Height="18" />
-                                        </StackPanel>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                        <Button Command="{Binding RemoveEntryCommand}"
-                                IsEnabled="{Binding CanDeletePosition}"
-                                Background="#684fa3">
-                            <Button.Template>
-                                <ControlTemplate>
-                                    <Border Background="{TemplateBinding Background}"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Stretch" IsEnabled="{Binding CanDeletePosition}"
-                                            BorderThickness="8"
-                                            CornerRadius="3">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Delete Selected Entry"
-                                                       Foreground="WhiteSmoke"
-                                                       VerticalAlignment="Center"
-                                                       Margin="5,0,5,0" />
-                                            <Image Source="avares://ReceiptOverview/Assets/delete.png"
-                                                   Width="18"
-                                                   Height="18" />
-                                        </StackPanel>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                    </StackPanel>
-                </DockPanel>
-
-                <DataGrid IsReadOnly="True"
-                          ItemsSource="{Binding CurrentPosition.Entries, Mode=TwoWay}"
-                          SelectedItem="{Binding CurrentEntry, Mode=TwoWay}"
-                          Margin="0,0,10,0"
-                          VerticalAlignment="Stretch"
-                          IsTabStop="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Item"
-                                            Binding="{Binding Item, Mode=TwoWay}"
-                                            MinWidth="120" />
-                        <DataGridTextColumn Header="Price"
-                                            Binding="{Binding Price, Mode=TwoWay}" />
-                        <DataGridTextColumn Header="Category"
-                                            Binding="{Binding Category, Mode=TwoWay}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <DockPanel HorizontalAlignment="Right"
-                           Width="150">
-                    <Button Margin="5,10,10,0"
-                            HotKey="Ctrl+S"
-                            Command="{Binding SaveCommand}"
-                            Name="BtnSavePosition"
-                            IsTabStop="False">
+            <DockPanel HorizontalAlignment="Right" DockPanel.Dock="Top"
+                       Name="DockEntryButtons"
+                       Margin="0,5,0,25">
+                <StackPanel Orientation="Horizontal">
+                    <Button Margin="5,0,10,0"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding NewEntryCommand}"
+                            IsTabStop="False"
+                            Name="BtnSaveEntry"
+                            Click="BtnSaveEntry_OnClick">
                         <Button.Template>
                             <ControlTemplate>
                                 <Border Background="{TemplateBinding Background}"
                                         VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
                                         BorderThickness="8"
                                         CornerRadius="3">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Save Position"
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center">
+                                        <TextBlock Text="Save Entry"
                                                    VerticalAlignment="Center"
                                                    Margin="5,0,5,0" />
                                         <Image Source="avares://ReceiptOverview/Assets/add.png"
@@ -370,8 +303,78 @@
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-                </DockPanel>
-            </StackPanel>
+
+                    <Button Command="{Binding RemoveEntryCommand}"
+                            IsEnabled="{Binding CanDeletePosition}"
+                            Background="#684fa3">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Border Background="{TemplateBinding Background}"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
+                                        IsEnabled="{Binding CanDeletePosition}"
+                                        BorderThickness="8"
+                                        CornerRadius="3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Delete Selected Entry"
+                                                   Foreground="WhiteSmoke"
+                                                   VerticalAlignment="Center"
+                                                   Margin="5,0,5,0" />
+                                        <Image Source="avares://ReceiptOverview/Assets/delete.png"
+                                               Width="18"
+                                               Height="18" />
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <DataGrid IsReadOnly="True" DockPanel.Dock="Top"
+                      Name="GridEntries"
+                      ItemsSource="{Binding CurrentPosition.Entries, Mode=TwoWay}"
+                      SelectedItem="{Binding CurrentEntry, Mode=TwoWay}"
+                      IsTabStop="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Item"
+                                        Binding="{Binding Item, Mode=TwoWay}"
+                                        MinWidth="120" />
+                    <DataGridTextColumn Header="Price"
+                                        Binding="{Binding Price, Mode=TwoWay}" />
+                    <DataGridTextColumn Header="Category"
+                                        Binding="{Binding Category, Mode=TwoWay}" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <DockPanel HorizontalAlignment="Right" DockPanel.Dock="Top"
+                       Name="PanelSavePositionButton"
+                       Width="150">
+                <Button Margin="5,10,10,0"
+                        HotKey="Ctrl+S"
+                        Command="{Binding SaveCommand}"
+                        Name="BtnSavePosition"
+                        IsTabStop="False">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Border Background="{TemplateBinding Background}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    BorderThickness="8"
+                                    CornerRadius="3">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Save Position"
+                                               VerticalAlignment="Center"
+                                               Margin="5,0,5,0" />
+                                    <Image Source="avares://ReceiptOverview/Assets/add.png"
+                                           Width="18"
+                                           Height="18" />
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </DockPanel>
         </DockPanel>
     </Grid>
 </Window>

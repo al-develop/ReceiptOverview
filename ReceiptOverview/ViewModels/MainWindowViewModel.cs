@@ -27,7 +27,6 @@ namespace ReceiptOverview.ViewModels
             get => _positions;
             set => this.RaiseAndSetIfChanged(ref _positions, value);
         }
-
         public EntryViewModel CurrentEntry
         {
             get => _currentEntry;
@@ -38,37 +37,33 @@ namespace ReceiptOverview.ViewModels
                 this.RaiseAndSetIfChanged(ref _currentEntry, value);
             }
         }
-
         public PositionViewModel CurrentPosition
         {
             get => _currentPosition;
             set
             {
-                this.CanDeletePosition = true;
                 LoadEntries();
+                if (value == null)
+                    value = new PositionViewModel();
                 this.RaiseAndSetIfChanged(ref _currentPosition, value);
             }
         }
-
         public bool CanDeleteEntry
         {
             get => _canDeleteEntry;
             set => this.RaiseAndSetIfChanged(ref _canDeleteEntry, value);
         }
-
         public bool CanDeletePosition
         {
             get => _canDeletePosition;
             set => this.RaiseAndSetIfChanged(ref _canDeletePosition, value);
         }
-
         public bool MainUiActive
         {
             get => _mainUiActive;
             set => this.RaiseAndSetIfChanged(ref _mainUiActive, value);
         }
-
-
+        
         public ICommand NewPositionCommand { get; }
         public ICommand RemovePositionCommand { get; }
         public ICommand NewEntryCommand { get; }
@@ -120,7 +115,7 @@ namespace ReceiptOverview.ViewModels
                 if (position.Entries == null)
                     position.Entries = new();
             }
-            
+
             CurrentPosition = Positions.FirstOrDefault();
         }
 
@@ -147,7 +142,6 @@ namespace ReceiptOverview.ViewModels
                 CurrentPosition.Entries.Add(vm);
             }
         }
-
 
         private void CreateNewPosition()
         {
@@ -184,7 +178,8 @@ namespace ReceiptOverview.ViewModels
             // the entry was saved and we got the id.
             // Before reseting the field, the id in the CurrentPosition.Entries needs to be updated
             CurrentPosition.Entries.Replace(CurrentEntry, entryWithId);
-
+            CurrentPosition.Total = CurrentPosition.Entries.Sum(s => Convert.ToDecimal(s.Price)).ToString();
+            
             // reset entry fields
             CreateEmptyCurrentEntry(CurrentPosition.Id);
 
@@ -198,7 +193,8 @@ namespace ReceiptOverview.ViewModels
 
             MainUiActive = false;
 
-            bool confirm = await ShowDeleteDialog("Delete Position", $"Are you sure, you want to delete the position {CurrentPosition.Id}?");
+            bool confirm = await ShowDeleteDialog("Delete Position",
+                $"Are you sure, you want to delete the position {CurrentPosition.Id}?");
 
             if (!confirm)
                 return;
@@ -216,7 +212,8 @@ namespace ReceiptOverview.ViewModels
 
             MainUiActive = false;
 
-            SimpleMessageBoxViewModel dialog = new("Delete Entry", $"Are you sure, you want to delete the entry {CurrentEntry.Id}?");
+            SimpleMessageBoxViewModel dialog = new("Delete Entry",
+                $"Are you sure, you want to delete the entry {CurrentEntry.Id}?");
             await ShowDialog.Handle(dialog);
             bool confirm = dialog.Result;
 
@@ -236,6 +233,8 @@ namespace ReceiptOverview.ViewModels
 
             foreach (var entry in CurrentPosition.Entries)
             {
+                if (entry.Id == 0)
+                    continue;
                 Logic.SaveEntry(entry.VmToModel());
             }
         }
@@ -259,7 +258,8 @@ namespace ReceiptOverview.ViewModels
             StringBuilder errorMessage = new();
             errorMessage.AppendLine("Connection failed. Please verify that");
             errorMessage.AppendLine("   - /Data/data.db exists");
-            errorMessage.AppendLine("   - all tables were created. Run 'create_db.sql' on an existing, but empty data.db file to create tables.");
+            errorMessage.AppendLine(
+                "   - all tables were created. Run 'create_db.sql' on an existing, but empty data.db file to create tables.");
             errorMessage.AppendLine("('create_db.sql' can be found in the /Data/ directory of the application)");
             return errorMessage.ToString();
         }
@@ -273,18 +273,25 @@ namespace ReceiptOverview.ViewModels
 
         private void AutofillEntry()
         {
-            if(CurrentPosition == null || CurrentPosition.Entries == null || CurrentEntry == null)
+            if (CurrentPosition == null || CurrentPosition.Entries == null || CurrentEntry == null)
                 return;
-            
+
             // check, if there is any entry with the same Item already stored in other Positions, then take the first
             //  occurence and fill the other fields.
             // do not use the entry ID for the search, as each entry needs to be a unique database entity, because 
             //  they differ in their PositionId.
-            if (Positions.Any(a => a.Entries.Any(b => b.Item == CurrentEntry.Item)))
+            try
             {
-                // CurrentEntry.Item = Positions.Select(s => s.Entries.Select(s => s.Item).First()).First();
-                CurrentEntry.Category = Positions.Select(s => s.Entries.Select(t => t.Category).First()).First();
-                CurrentEntry.Price = Positions.Select(s => s.Entries.Select(t => t.Price).First()).First();
+                if (Positions.Any(a => a.Entries.Any(b => b.Item == CurrentEntry.Item)))
+                {
+                    // CurrentEntry.Item = Positions.Select(s => s.Entries.Select(s => s.Item).First()).First();
+                    CurrentEntry.Category = Positions.Select(s => s.Entries.Select(t => t.Category).First()).First();
+                    CurrentEntry.Price = Positions.Select(s => s.Entries.Select(t => t.Price).First()).First();
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                return;
             }
         }
 

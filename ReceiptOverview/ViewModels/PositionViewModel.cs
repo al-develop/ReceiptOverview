@@ -25,10 +25,8 @@ public class PositionViewModel : ViewModelBase
         set
         {
             this.RaiseAndSetIfChanged(ref _entries, value);
-            this.Total = Entries.Sum(s => decimal.Parse(s.Price)).ToString();
         }
     }
-
     public string Total
     {
         get
@@ -39,13 +37,14 @@ public class PositionViewModel : ViewModelBase
         }
         set => this.RaiseAndSetIfChanged(ref _total, value);
     }
-
     public int Id
     {
         get => _id;
         set => this.RaiseAndSetIfChanged(ref _id, value);
     }
 
+    
+    
     public DateTime ToDateTime() => new(Date.Year, Date.Month, Date.Day);
     public void FromDateTime(DateTime date)
     {
