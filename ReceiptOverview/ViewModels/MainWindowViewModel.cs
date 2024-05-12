@@ -380,6 +380,9 @@ namespace ReceiptOverview.ViewModels
         private void CreateEmptyCurrentEntry(int positionId)
         {
             CurrentEntry = new();
+            if (CurrentEntry == null)
+                CurrentEntry = new();
+            
             CurrentEntry.ItemChanged += HandleItemChanged;
             CurrentEntry.Id = 0;
             CurrentEntry.PositionId = positionId;
