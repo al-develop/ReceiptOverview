@@ -1,18 +1,15 @@
 # Receipt Overview
 
-A little piece of software, to digitalize Receipts and export them as a .csv
-Still under development.
-Missing features:
-- CSV Export
-- Implementation of support of a workflow to enhance the User Experience.
+A little piece of software, to digitalize Receipts and export them as a .csv to be used in R for data analysis and statistics
 
 ![grafik](https://github.com/al-develop/ReceiptOverview/assets/16868184/3c5a2b7a-e095-4d71-b479-bd364153f831)
 
 
 ## Made with
 
-    Avalonia UI 11.0.10
+    Avalonia UI 11.0.10 with the build-in Reactive UI MVVM Framework
     C# & dotnet 7.0
+    SQLite 3 and the corresponding NuGet Package
     Icons8
 
 ## Build for
@@ -20,12 +17,12 @@ Missing features:
     Fedora Linux
     Windows 10
 
-(not tested on other systems, but should build and run wherever the dotnet 7.0 Runtime is installed)
+(not tested on other systems, but should build and run wherever the dotnet 7.0 Runtime/SDK is installed)
 
 ## For Code-Readers
 
-The goal was fast development, with no plans to expand further than the base functionalities.
-Therefore, maintenance was not a priority, which results in a somewhat messy Codebase by design.
+The goal was fast development, with no plans to expand further than the base functionalities (which are: inserting Receipts and their entries and export everything to a csv file).
+Therefore, maintenance was not a priority, which results in a somewhat messy Codebase.
 
 ## License
 
