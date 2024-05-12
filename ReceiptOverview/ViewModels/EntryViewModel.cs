@@ -1,3 +1,4 @@
+using System;
 using ReactiveUI;
 using ReceiptOverview.Models;
 
@@ -5,6 +6,8 @@ namespace ReceiptOverview.ViewModels;
 
 public class EntryViewModel : ViewModelBase
 {
+    public event Action<string> ItemChanged;
+    
     private int _id;
     private int _positionId;
     private string _item;
@@ -31,7 +34,11 @@ public class EntryViewModel : ViewModelBase
     public string Item
     {
         get => _item;
-        set => this.RaiseAndSetIfChanged(ref _item, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _item, value);
+            ItemChanged?.Invoke(value);
+        }
     }
 
     public int PositionId
@@ -46,6 +53,10 @@ public class EntryViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _id, value);
     }
 
+    /// <summary>
+    /// The current instance of EntryViewModel will be converted to a Entry model and returned
+    /// </summary>
+    /// <returns></returns>
     public Entry VmToModel()
     {
         Entry mapped = new Entry();
@@ -57,6 +68,9 @@ public class EntryViewModel : ViewModelBase
         return mapped;
     }
 
+    /// <summary>
+    /// the current instance of EntryViewModel will converted from a Entry Model
+    /// </summary>
     public void ModelToVm(Entry entry)
     {
         this.Id = entry.Id;

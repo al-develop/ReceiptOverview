@@ -75,5 +75,16 @@ public class PositionViewModel : ViewModelBase
         this.Id = position.Id;
         this.Date = new DateViewModel(position.Date);
         this.Total = position.Total.ToString();
+
+        // if (position.Entries == null) 
+        //     return;
+        //
+        this.Entries = new();
+        // foreach (var entry in position.Entries)
+        // {
+        //     EntryViewModel entryVm = new();
+        //     entryVm.ModelToVm(entry);
+        //     this.Entries.Add(entryVm);
+        // }
     }
 }

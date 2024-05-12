@@ -44,4 +44,19 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
         }
     }
+
+    private void TbxItemName_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TbxItemName.SelectAll();
+    }
+
+    private void TbxCategory_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TbxCategory.SelectAll();
+    }
+
+    private void TbxPrice_OnGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        TbxPrice.SelectAll();
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
@@ -8,11 +9,13 @@ using System.Windows.Input;
 using DynamicData;
 using ReactiveUI;
 using ReceiptOverview.Logic;
+using ReceiptOverview.Models;
 
 namespace ReceiptOverview.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        // private EventAggregator _eventAggregator;
         private CentralLogic Logic { get; }
 
         private PositionViewModel _currentPosition;
@@ -33,7 +36,7 @@ namespace ReceiptOverview.ViewModels
             set
             {
                 this.CanDeleteEntry = true;
-                this.AutofillEntry();
+                //this.AutofillEntry();
                 this.RaiseAndSetIfChanged(ref _currentEntry, value);
             }
         }
@@ -42,10 +45,13 @@ namespace ReceiptOverview.ViewModels
             get => _currentPosition;
             set
             {
+                this.RaiseAndSetIfChanged(ref _currentPosition, value);
                 LoadEntries();
                 if (value == null)
                     value = new PositionViewModel();
-                this.RaiseAndSetIfChanged(ref _currentPosition, value);
+                CanDeletePosition = true;
+                CheckVisible = false;
+                CrossVisible = false;
             }
         }
         public bool CanDeleteEntry
@@ -63,7 +69,20 @@ namespace ReceiptOverview.ViewModels
             get => _mainUiActive;
             set => this.RaiseAndSetIfChanged(ref _mainUiActive, value);
         }
+        private bool _checkVisible;
+        private bool _crossVisible;
         
+
+        public bool CrossVisible
+        {
+            get => _crossVisible;
+            set => this.RaiseAndSetIfChanged(ref _crossVisible, value);
+        }
+        public bool CheckVisible
+        {
+            get => _checkVisible;
+            set => this.RaiseAndSetIfChanged(ref _checkVisible, value);
+        }
         public ICommand NewPositionCommand { get; }
         public ICommand RemovePositionCommand { get; }
         public ICommand NewEntryCommand { get; }
@@ -77,14 +96,18 @@ namespace ReceiptOverview.ViewModels
         public MainWindowViewModel()
         {
             Logic = new CentralLogic();
-
+            // _eventAggregator = new EventAggregator();
+            
             MainUiActive = true;
             CanDeleteEntry = false;
             CanDeletePosition = false;
-
+            CheckVisible = false;
+            CrossVisible = false;
+            
             Positions = new ObservableCollection<PositionViewModel>();
             CurrentPosition = new PositionViewModel();
             CurrentEntry = new EntryViewModel();
+            CurrentEntry.ItemChanged += HandleItemChanged;
             ShowDialog = new Interaction<SimpleMessageBoxViewModel, bool?>();
 
             RemovePositionCommand = ReactiveCommand.CreateFromTask(async () => await RemovePosition());
@@ -96,24 +119,27 @@ namespace ReceiptOverview.ViewModels
             ExportToCsvCommand = ReactiveCommand.Create(() => ExportToCsv());
             CheckDbConnectionCommand = ReactiveCommand.Create(async () => await CheckDbConnection());
 
-            LoadPositions();
+            LoadPositionsWithEntries();
         }
 
-        private void LoadPositions()
+        private void LoadPositionsWithEntries()
         {
-            var data = Logic.GetPositions();
-            foreach (var model in data)
+            List<Position> positions = Logic.GetPositions();
+            foreach (var pos in positions)
             {
+                // List<Entry> entries = Logic.GetEntriesForPosition(pos.Id);
+                // if (pos.Entries == null)
+                //     pos.Entries = new();
+                //
+                // foreach (var entry in entries)
+                // {
+                //     pos.Entries.Add(entry);
+                // }
+                
                 PositionViewModel vm = new();
-                vm.ModelToVm(model);
+                vm.ModelToVm(pos);
+                
                 this.Positions.Add(vm);
-            }
-
-            // save guard
-            foreach (var position in Positions)
-            {
-                if (position.Entries == null)
-                    position.Entries = new();
             }
 
             CurrentPosition = Positions.FirstOrDefault();
@@ -155,7 +181,9 @@ namespace ReceiptOverview.ViewModels
                 previousYear = CurrentPosition.Date.Year;
             }
 
-            CurrentPosition = new();
+            CurrentPosition = new PositionViewModel();
+            if (CurrentPosition == null)
+                CurrentPosition = new PositionViewModel();
             CurrentPosition.Id = 0;
             CurrentPosition.Date = new DateViewModel(1, previousMonth, previousYear);
             CurrentPosition.Total = string.Empty;
@@ -168,6 +196,8 @@ namespace ReceiptOverview.ViewModels
 
             Positions.Add(CurrentPosition);
             CanDeletePosition = true;
+            CheckVisible = false;
+            CrossVisible = true;
         }
 
         private void SaveEntry()
@@ -197,12 +227,17 @@ namespace ReceiptOverview.ViewModels
                 $"Are you sure, you want to delete the position {CurrentPosition.Id}?");
 
             if (!confirm)
+            {
+                MainUiActive = true;
                 return;
+            }
 
             // Code to remove a position from the datasource, and then from the collection
             Logic.DeletePosition(CurrentPosition.VmToModel());
             this.Positions.Remove(CurrentPosition);
             MainUiActive = true;
+            CheckVisible = false;
+            CrossVisible = false;
         }
 
         private async Task RemoveEntry()
@@ -212,13 +247,15 @@ namespace ReceiptOverview.ViewModels
 
             MainUiActive = false;
 
-            SimpleMessageBoxViewModel dialog = new("Delete Entry",
-                $"Are you sure, you want to delete the entry {CurrentEntry.Id}?");
+            SimpleMessageBoxViewModel dialog = new("Delete Entry", $"Are you sure, you want to delete the entry {CurrentEntry.Id}?");
             await ShowDialog.Handle(dialog);
             bool confirm = dialog.Result;
 
             if (!confirm)
+            {
+                MainUiActive = true;
                 return;
+            }
 
             // Code to remove an entry from the db, and then from the collection
             Logic.DeleteEntry(CurrentEntry.VmToModel());
@@ -237,6 +274,9 @@ namespace ReceiptOverview.ViewModels
                     continue;
                 Logic.SaveEntry(entry.VmToModel());
             }
+
+            CheckVisible = true;
+            CrossVisible = false;
         }
 
         private void ExportToCsv()
@@ -271,6 +311,11 @@ namespace ReceiptOverview.ViewModels
             return dialog.Result;
         }
 
+        private void HandleItemChanged(string newItem)
+        {
+            AutofillEntry();
+        }
+
         private void AutofillEntry()
         {
             if (CurrentPosition == null || CurrentPosition.Entries == null || CurrentEntry == null)
@@ -282,11 +327,15 @@ namespace ReceiptOverview.ViewModels
             //  they differ in their PositionId.
             try
             {
-                if (Positions.Any(a => a.Entries.Any(b => b.Item == CurrentEntry.Item)))
+                foreach (var position in Positions)
                 {
-                    // CurrentEntry.Item = Positions.Select(s => s.Entries.Select(s => s.Item).First()).First();
-                    CurrentEntry.Category = Positions.Select(s => s.Entries.Select(t => t.Category).First()).First();
-                    CurrentEntry.Price = Positions.Select(s => s.Entries.Select(t => t.Price).First()).First();
+                    List<Entry> entries = Logic.GetEntriesForPosition(position.Id);
+                    if (entries.Any(a => string.Equals(a.Item, CurrentEntry.Item, StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        CurrentEntry.Category = entries.First(f => string.Equals(f.Item, CurrentEntry.Item, StringComparison.CurrentCultureIgnoreCase)).Category;
+                        CurrentEntry.Price = entries.First(f => string.Equals(f.Item, CurrentEntry.Item, StringComparison.CurrentCultureIgnoreCase)).Price.ToString();
+                        return;
+                    }
                 }
             }
             catch (InvalidOperationException)
@@ -298,6 +347,7 @@ namespace ReceiptOverview.ViewModels
         private void CreateEmptyCurrentEntry(int positionId)
         {
             CurrentEntry = new();
+            CurrentEntry.ItemChanged += HandleItemChanged;
             CurrentEntry.Id = 0;
             CurrentEntry.PositionId = positionId;
             CurrentPosition.Entries.Add(CurrentEntry);
