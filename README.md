@@ -2,6 +2,14 @@
 
 A little piece of software, to digitalize Receipts and export them as a .csv to be used in R for data analysis and statistics.
 
+# Initial Setup
+
+The application needs a database in the following path: <ApplicationDirectory>/Data/data.db
+After starting the application for the first time, an empty data.db is created. This one can be deleted.
+Instead, use the DB Browser for SQLite (https://sqlitebrowser.org/) to run the "create_db.sql" script which is located in the same directory (<ApplicationDirectory>/Data/create_db.sql)
+The resulting database needs to be saved as "data.db" in the same directory (<ApplicationDirectory>/Data/data.db).
+Afterwards, the application is ready for usage.
+
 ## Shortcuts/Hotkeys:
 
 | Hotkey | Function |
