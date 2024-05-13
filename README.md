@@ -35,7 +35,7 @@ Afterwards, the application is ready for usage.
 
 ## Build for
 
-    Fedora Linux
+    Fedora Linux 39 & 40 (KDE, x11)
     Windows 10
 
 (not tested on other systems, but should build and run wherever the dotnet 7.0 Runtime/SDK is installed)
