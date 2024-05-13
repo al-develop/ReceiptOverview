@@ -21,8 +21,7 @@ Afterwards, the application is ready for usage.
 | - | Remove selected entry |
 | Ctrl+S | Save current position |
 
-
-![grafik](https://github.com/al-develop/ReceiptOverview/assets/16868184/3c5a2b7a-e095-4d71-b479-bd364153f831)
+![grafik](https://github.com/al-develop/ReceiptOverview/assets/16868184/7512ff2a-de5d-4fbd-bad0-44ea824afbb3)
 
 
 ## Made with
