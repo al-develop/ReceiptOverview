@@ -130,15 +130,6 @@ namespace ReceiptOverview.ViewModels
             List<Position> positions = Logic.GetPositions();
             foreach (var pos in positions)
             {
-                // List<Entry> entries = Logic.GetEntriesForPosition(pos.Id);
-                // if (pos.Entries == null)
-                //     pos.Entries = new();
-                //
-                // foreach (var entry in entries)
-                // {
-                //     pos.Entries.Add(entry);
-                // }
-                
                 PositionViewModel vm = new();
                 vm.ModelToVm(pos);
                 
