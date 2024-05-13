@@ -284,8 +284,8 @@ namespace ReceiptOverview.ViewModels
         {
             CsvExport = new CsvExport();
             CsvExport.ExportToCsV(Logic);
-            var title = "CSV Export";
-            var message = "Export done";
+            var title = "CSV Export done";
+            var message = "Export done. See: Installation directory -> Export -> Positions.csv";
 
             SimpleMessageBoxViewModel dialog = new(title, message, false);
             await ShowDialog.Handle(dialog);
@@ -324,10 +324,10 @@ namespace ReceiptOverview.ViewModels
 
         private void ClearEntry()
         {
-            CurrentEntry = new EntryViewModel();
+            CreateEmptyCurrentEntry(CurrentPosition.Id);
         }
-        
-        
+
+
         private string GetConnectionErrorMessage()
         {
             StringBuilder errorMessage = new();
