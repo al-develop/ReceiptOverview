@@ -83,6 +83,7 @@ namespace ReceiptOverview.ViewModels
         }
 
 
+        public ICommand ClearEntryCommand { get; set; }
         public ICommand CopyEntryCommand { get; set; }
         public ICommand NewPositionCommand { get; }
         public ICommand RemovePositionCommand { get; }
@@ -115,11 +116,12 @@ namespace ReceiptOverview.ViewModels
             
             CopyEntryCommand = ReactiveCommand.Create(() => CopyEntry());
             NewPositionCommand = ReactiveCommand.Create(() => CreateNewPosition());
-            NewEntryCommand = ReactiveCommand.Create(() => SaveEntry());
-            SaveCommand = ReactiveCommand.Create(() => Save());
-            ExportToCsvCommand = ReactiveCommand.Create(async() => await ExportToCsv());
-            CheckDbConnectionCommand = ReactiveCommand.Create(async () => await CheckDbConnection());
-
+            NewEntryCommand = ReactiveCommand.Create(() => AddEntry());
+            SaveCommand = ReactiveCommand.Create(() => SavePositionsWithEntries());
+            ExportToCsvCommand = ReactiveCommand.Create(()=>  ExportToCsv());
+            CheckDbConnectionCommand = ReactiveCommand.Create(() => CheckDbConnection());
+            ClearEntryCommand = ReactiveCommand.Create(() => ClearEntry());
+            
             LoadPositionsWithEntries();
         }
 
@@ -194,7 +196,7 @@ namespace ReceiptOverview.ViewModels
             CrossVisible = true;
         }
 
-        private void SaveEntry()
+        private void AddEntry()
         {
             int entryId = Logic.SaveEntry(CurrentEntry.VmToModel());
             EntryViewModel entryWithId = CurrentEntry;
@@ -236,8 +238,12 @@ namespace ReceiptOverview.ViewModels
 
         private async Task RemoveEntry()
         {
-            if (CurrentEntry == null! || CurrentEntry.Id == 0)
+            if (CurrentEntry == null || CurrentEntry.Id == 0)
+            {
+                if (CurrentPosition.Entries.Contains(CurrentEntry))
+                    CurrentPosition.Entries.Remove(CurrentEntry);
                 return;
+            }
             
             MainUiActive = false;
 
@@ -259,7 +265,7 @@ namespace ReceiptOverview.ViewModels
             MainUiActive = true;
         }
 
-        private void Save()
+        private void SavePositionsWithEntries()
         {
             Logic.SavePosition(CurrentPosition.VmToModel());
 
@@ -314,6 +320,11 @@ namespace ReceiptOverview.ViewModels
 
             CrossVisible = true;
             CheckVisible = false;
+        }
+
+        private void ClearEntry()
+        {
+            CurrentEntry = new EntryViewModel();
         }
         
         
