@@ -216,7 +216,6 @@
                     <TextBox Watermark="Day"
                              Name="TbxDay"
                              TabIndex="0"
-                             GotFocus="TbxDay_OnGotFocus"
                              Text="{Binding CurrentPosition.Date.Day, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical"
@@ -225,7 +224,6 @@
                     <TextBox Watermark="Month"
                              TabIndex="1"
                              Name="TbxMonth"
-                             GotFocus="TbxMonth_OnGotFocus"
                              Text="{Binding CurrentPosition.Date.Month, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel Orientation="Vertical"
@@ -234,7 +232,6 @@
                     <TextBox Watermark="Year"
                              TabIndex="2"
                              Name="TbxYear"
-                             GotFocus="TbxYear_OnGotFocus"
                              Text="{Binding CurrentPosition.Date.Year, Mode=TwoWay}" />
                 </StackPanel>
             </StackPanel>

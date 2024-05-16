@@ -60,21 +60,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         TbxPrice.SelectAll();
     }
 
-    private void TbxDay_OnGotFocus(object? sender, GotFocusEventArgs e)
-    {
-        TbxDay.SelectAll();
-    }
-
-    private void TbxYear_OnGotFocus(object? sender, GotFocusEventArgs e)
-    {
-        TbxMonth.SelectAll();
-    }
-
-    private void TbxMonth_OnGotFocus(object? sender, GotFocusEventArgs e)
-    {
-        TbxYear.SelectAll();
-    }
-
     private void BtnNewPos_OnClick(object? sender, RoutedEventArgs e)
     {
         TbxDay.Focus();
