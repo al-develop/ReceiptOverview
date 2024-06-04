@@ -21,6 +21,8 @@ Afterwards, the application is ready for usage.
 | - | Remove selected entry |
 | Ctrl+S | Save current position |
 
+Take notice, that the "Delete" Button is a Hotkey and therefore should not be used to remove charactes. Use "Backspace" instead.
+
 ![grafik](https://github.com/al-develop/ReceiptOverview/assets/16868184/7512ff2a-de5d-4fbd-bad0-44ea824afbb3)
 
 
